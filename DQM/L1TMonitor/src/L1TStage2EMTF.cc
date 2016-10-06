@@ -45,7 +45,7 @@ void L1TStage2EMTF::bookHistograms(DQMStore::IBooker& ibooker, const edm::Run&, 
   std::vector<std::string> suffix_name = {"42", "41", "32", "31", "22", "21", "13", "12", "11b", "11a"};
   std::vector<std::string> suffix_label = {"4/2", "4/1", "3/2", "3/1", " 2/2", "2/1", "1/3", "1/2", "1/1b", "1/1a"}; //added by Emma
 
-  emtfHitBX = ibooker.book2D("emtfHitBX", "EMTF Hit BX", 8, -3, 5, 18, 0, 18);
+/*  emtfHitBX = ibooker.book2D("emtfHitBX", "EMTF Hit BX", 8, -3, 5, 18, 0, 18);
   emtfHitBX->setAxisTitle("BX", 1);
   for (int xbin = 1, xbin_label = -3; xbin <= 8; ++xbin, ++xbin_label) {
     emtfHitBX->setBinLabel(xbin, std::to_string(xbin_label), 1);
@@ -53,7 +53,7 @@ void L1TStage2EMTF::bookHistograms(DQMStore::IBooker& ibooker, const edm::Run&, 
   for (int ybin = 1; ybin <= 9; ++ybin) {
     emtfHitBX->setBinLabel(ybin, "ME-" + suffix_label[ybin - 1], 2);
     emtfHitBX->setBinLabel(19 - ybin, "ME+" + suffix_label[ybin - 1], 2);
-  }
+  } */ //removed by Emma
 
 /*  for (int hist = 0, i = 0; hist < 18; ++hist, i = hist % 9) {
 
@@ -395,7 +395,7 @@ void L1TStage2EMTF::analyze(const edm::Event& e, const edm::EventSetup& c) {
 
     if (endcap > 0) hist_index = 19 - hist_index; //altered by Emma
 
-    emtfHitBX->Fill(Hit->BX(), hist_index);
+//    emtfHitBX->Fill(Hit->BX(), hist_index);
 
     emtfHitStrip[hist_index]->Fill(strip);
     emtfHitWire[hist_index]->Fill(wire);
@@ -539,7 +539,7 @@ void L1TStage2EMTF::analyze(const edm::Event& e, const edm::EventSetup& c) {
     for (int binX=1; binX <= emtfTrackPhiHighQuality_QT_sqrt->getTH1()->GetNbinsX(); binX++) {
 	emtfTrackPhiHighQuality_QT_hot->getTH1()->SetBinContent(binX, 1 - meanPhiHighQuality + emtfTrackPhiHighQuality_QT_sqrt->getTH1()->GetBinContent(binX));
 	emtfTrackPhiHighQuality_QT_dead->getTH1()->SetBinContent(binX, 1 + meanPhiHighQuality - emtfTrackPhiHighQuality_QT_sqrt->getTH1()->GetBinContent(binX));
-    }
+    } 
 //=============================================================================================================
 //=============================================================================================================
     emtfTrackOccupancy->Fill(eta, phi_glob_rad);

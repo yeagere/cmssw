@@ -81,7 +81,7 @@ process.l1tMonitorPath = cms.Path(
 process.l1tStage2OnlineDQM.remove(process.l1tStage2CaloLayer1) #added by Emma
 process.l1tStage2OnlineDQM.remove(process.l1tStage2CaloLayer2) #added by Emma
 process.l1tStage2OnlineDQM.remove(process.l1tStage2Bmtf) #added by Emma
-#process.l1tStageOonlinDQMe.remove(process.l1tStage2Emtf) #added by Emma
+#process.l1tStageOonlineDQM.remove(process.l1tStage2Emtf) #added by Emma
 process.l1tStage2OnlineDQM.remove(process.l1tStage2uGMT) #added by Emma
 process.l1tStage2OnlineDQM.remove(process.l1tStage2uGt) #added by Emma
 

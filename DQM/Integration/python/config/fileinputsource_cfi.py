@@ -4,6 +4,8 @@ source = cms.Source(
     "PoolSource",
     fileNames = cms.untracked.vstring(
 	"/store/express/Run2016H/ExpressPhysics/FEVT/Express-v2/000/281/613/00000/003CF22A-FA82-E611-B844-02163E0119BD.root" #added by Emma
+	#"/store/express/Run2016H/ExpressPhysics/FEVT/Express-v2/000/281/976/00001/00B12511-1787-E611-B3EA-02163E012699.root"
+
     )
 )
 

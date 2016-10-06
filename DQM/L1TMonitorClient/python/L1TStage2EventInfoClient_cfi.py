@@ -117,7 +117,18 @@ l1tStage2EventInfoClient = cms.EDAnalyzer("L1TEventInfoClient",
                         HwValLabel = cms.string("Stage2OMTF"),
                         SystemDisable  = cms.uint32(0),
                         QualityTests = cms.VPSet(
-
+                            cms.PSet(
+                                QualityTestName = cms.string(""),
+                                QualityTestHist = cms.string(""),
+                                QualityTestSummaryEnabled = cms.uint32(0)
+                                ),
+                            )
+                        ),
+                    cms.PSet(
+                        SystemLabel = cms.string("EMTF"),
+                        HwValLabel = cms.string("Stage2EMTF"),
+                        SystemDisable  = cms.uint32(0),
+                        QualityTests = cms.VPSet(
                             cms.PSet(
                                 QualityTestName = cms.string("NoisyChannel_Chamber_Hot"),
                                 QualityTestHist = cms.string("L1T2016/L1TStage2EMTF/emtfChamberStrip_QT_hot*"),
@@ -147,18 +158,6 @@ l1tStage2EventInfoClient = cms.EDAnalyzer("L1TEventInfoClient",
                                 QualityTestHist = cms.string("L1T2016/L1TStage2EMTF/emtfTrackPhi*"),
                                 QualityTestSummaryEnabled = cms.uint32(1)
                                 ) 
-                            )
-                        ),
-                    cms.PSet(
-                        SystemLabel = cms.string("EMTF"),
-                        HwValLabel = cms.string("Stage2EMTF"),
-                        SystemDisable  = cms.uint32(0),
-                        QualityTests = cms.VPSet(
-                            cms.PSet(
-                                QualityTestName = cms.string(""),
-                                QualityTestHist = cms.string(""),
-                                QualityTestSummaryEnabled = cms.uint32(0)
-                                ),
                             )
                         ),
                     cms.PSet(

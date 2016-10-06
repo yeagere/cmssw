@@ -40,10 +40,10 @@ class L1TStage2EMTF : public DQMEDAnalyzer {
   MonitorElement* emtfErrors;
 
   MonitorElement* emtfHitBX;
-  MonitorElement* emtfHitStrip[18];
-  MonitorElement* emtfHitWire[18];
-  MonitorElement* emtfChamberStrip[18];
-  MonitorElement* emtfChamberWire[18];
+  MonitorElement* emtfHitStrip[20]; //altered by Emma
+  MonitorElement* emtfHitWire[20]; //altered by Emma
+  MonitorElement* emtfChamberStrip[20]; //altered by Emma
+  MonitorElement* emtfChamberWire[20]; //altered by Emma
   MonitorElement* emtfHitOccupancy;
   
   MonitorElement* emtfnTracks;
