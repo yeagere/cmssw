@@ -1,19 +1,21 @@
 import FWCore.ParameterSet.Config as cms
 
-from Configuration.StandardSequences.Eras import eras
-process = cms.Process("L1TStage2DQM", eras.Run2_2016)
+#from Configuration.StandardSequences.Eras import eras #commented out by Emma
+#process = cms.Process("L1TStage2DQM", eras.Run2_2016) #commented out by Emma
+process = cms.Process("L1TStage2DQM") #added by Emma
 
 #--------------------------------------------------
 # Event Source and Condition
 
 # Live Online DQM in P5
-process.load("DQM.Integration.config.inputsource_cfi")
+#process.load("DQM.Integration.config.inputsource_cfi")
 
 # Testing in lxplus
-#process.load("DQM.Integration.config.fileinputsource_cfi")
+process.load("DQM.Integration.config.fileinputsource_cfi") #added by Emma
+process.load("DQM.Integration.config.FrontierCondition_GT_Offline_cfi") #added by Emma
 
 # Required to load Global Tag
-process.load("DQM.Integration.config.FrontierCondition_GT_cfi") 
+#process.load("DQM.Integration.config.FrontierCondition_GT_cfi") #commented out by Emma
 
 # Required to load EcalMappingRecord
 process.load("Configuration.StandardSequences.GeometryRecoDB_cff")
@@ -25,7 +27,7 @@ process.load("DQM.Integration.config.environment_cfi")
 
 process.dqmEnv.subSystemFolder = "L1T2016"
 process.dqmSaver.tag = "L1T2016"
-process.DQMStore.referenceFileName = "/dqmdata/dqm/reference/l1t_reference.root"
+#process.DQMStore.referenceFileName = "/dqmdata/dqm/reference/l1t_reference.root" #commented out by Emma
 
 process.dqmEndPath = cms.EndPath(process.dqmEnv * process.dqmSaver)
 
@@ -35,6 +37,11 @@ process.dqmEndPath = cms.EndPath(process.dqmEnv * process.dqmSaver)
 process.load("Configuration.StandardSequences.RawToDigi_Data_cff")    
 
 process.rawToDigiPath = cms.Path(process.RawToDigi)
+
+# Remove Unpacker Modules #added by Emma
+process.rawToDigiPath.remove(process.siStripDigis) #added by Emma
+process.rawToDigiPath.remove(process.gtDigis) #added by Emma
+process.rawToDigiPath.remove(process.gtEvmDigis) #added by Emma
 
 #--------------------------------------------------
 # Stage2 Unpacker and DQM Path
@@ -56,7 +63,7 @@ process.selfFatEventFilter = cms.EDFilter("HLTL1NumberFilter",
 process.load("DQM.L1TMonitor.L1TStage2_cff")
 
 process.l1tMonitorPath = cms.Path(
-    process.hltFatEventFilter +
+#    process.hltFatEventFilter + #commented out by Emma
 #    process.selfFatEventFilter +
     process.l1tStage2Unpack +
     process.l1tStage2OnlineDQM
@@ -69,6 +76,14 @@ process.l1tMonitorPath = cms.Path(
 #process.l1tStage2online.remove(process.l1tStage2Emtf)
 #process.l1tStage2online.remove(process.l1tStage2uGMT)
 #process.l1tStage2online.remove(process.l1tStage2uGt)
+
+# Remove DQM Modules #added by Emma
+process.l1tStage2OnlineDQM.remove(process.l1tStage2CaloLayer1) #added by Emma
+process.l1tStage2OnlineDQM.remove(process.l1tStage2CaloLayer2) #added by Emma
+process.l1tStage2OnlineDQM.remove(process.l1tStage2Bmtf) #added by Emma
+#process.l1tStageOonlinDQMe.remove(process.l1tStage2Emtf) #added by Emma
+process.l1tStage2OnlineDQM.remove(process.l1tStage2uGMT) #added by Emma
+process.l1tStage2OnlineDQM.remove(process.l1tStage2uGt) #added by Emma
 
 #--------------------------------------------------
 # Stage2 Quality Tests
