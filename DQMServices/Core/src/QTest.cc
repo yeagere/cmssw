@@ -758,6 +758,7 @@ float NoisyChannel::runTest(const MonitorElement *me)
               << me-> getFullname() << "\n";
 
   int nbins=0;
+  int nbinsX=0, nbinsY=0; //added by Emma
   //-- TH1F
   if (me->kind()==MonitorElement::DQM_KIND_TH1F)
   { 
@@ -779,8 +780,10 @@ float NoisyChannel::runTest(const MonitorElement *me)
   //-- TH2
   else if (me->kind()==MonitorElement::DQM_KIND_TH2F)
   { 
-    nbins = me->getTH2F()->GetXaxis()->GetNbins() *
-            me->getTH2F()->GetYaxis()->GetNbins();
+//    nbins = me->getTH2F()->GetXaxis()->GetNbins() *
+//            me->getTH2F()->GetYaxis()->GetNbins(); //removed by Emma
+    nbinsX = me->getTH2F()->GetXaxis()->GetNbins(); //added by Emma
+    nbinsY = me->getTH2F()->GetYaxis()->GetNbins(); //added by Emma
     h  = me->getTH2F(); // access Test histo
   } 
   //-- TH2
@@ -815,27 +818,52 @@ float NoisyChannel::runTest(const MonitorElement *me)
   int first = 1;
   // do NOT use overflow bin
   int last  = nbins;
+  int lastX  = nbinsX, lastY  = nbinsY; //added by Emma
   // bins outside Y-range
   int fail = 0;
   int bin;
-  for (bin = first; bin <= last; ++bin)
-  {
-    double contents = h->GetBinContent(bin);
-    double average = getAverage(bin, h);
-    bool failure = false;
-    if (average != 0)
-       failure = (((contents-average)/TMath::Abs(average)) > tolerance_);
-
-    if (failure)
+  int binX, binY; //added by Emma
+  if (nbinsY == 0) { //added by Emma for 1D histograms
+    for (bin = first; bin <= last; ++bin)
     {
-      ++fail;
-      DQMChannel chan(bin, 0, 0, contents, h->GetBinError(bin));
-      badChannels_.push_back(chan);
-    }
-  }
+      double contents = h->GetBinContent(bin);
+      double average = getAverage(bin, h);
+      bool failure = false;
+      if (average != 0)
+         failure = (((contents-average)/TMath::Abs(average)) > tolerance_);
 
-  // return fraction of bins that passed test
-  return 1.*(nbins - fail)/nbins;
+      if (failure)
+      {
+        ++fail;
+        DQMChannel chan(bin, 0, 0, contents, h->GetBinError(bin));
+        badChannels_.push_back(chan);
+      }
+    }
+
+    // return fraction of bins that passed test
+    return 1.*(nbins - fail)/nbins;
+    }
+  else { //added by Emma for 2D histograms
+    for (binY = first; binY <= lastY; ++binY) {
+      for (binX = first; binX <= lastX; ++binX) {
+        double contents = h->GetBinContent(binX, binY);
+        double average = getAverage2D(binX, binY, nbinsX, nbinsY, h);
+        std::cout<<"2D average: "<<average<<"\n";
+        bool failure = false;
+        if (average != 0)
+           failure = (((contents-average)/TMath::Abs(average)) > tolerance_);
+        if (failure)
+        {
+          ++fail;
+          DQMChannel chan(binX, 0, 0, contents, h->GetBinError(binX));
+          badChannels_.push_back(chan);
+        }
+      }
+    }
+
+    // return fraction of bins that passed test
+    return 1.*((nbinsX * nbinsY) - fail)/(nbinsX * nbinsY);
+  }
 }
 
 // get average for bin under consideration
@@ -863,6 +891,44 @@ double NoisyChannel::getAverage(int bin, const TH1 *h) const
   return sum/(numNeighbors_ * 2);
 }
 
+double NoisyChannel::getAverage2D(int binX, int binY, int nbinsX, int nbinsY, const TH1 *h) const //added by Emma
+{
+  /// do NOT use underflow bin
+  int first = 1;
+  /// do NOT use overflow bin
+  int ncx  = h->GetXaxis()->GetNbins();
+  int ncy  = h->GetYaxis()->GetNbins();
+  double sum = 0;
+  int bin_lowX, bin_hiX, bin_lowY, bin_hiY;
+  unsigned neighborsX = nbinsX;
+  unsigned neighborsY = nbinsY;
+
+  for (unsigned j = 1; j <= neighborsY; ++j) {
+    for (unsigned i = 1; i <= neighborsX; ++i) {
+      /// use symmetric-to-bin bins to calculate average
+      bin_lowY = binY-j;  bin_hiY = binY+j;
+      /// check if need to consider bins on other side of spectrum
+      /// (ie. if bins below 1 or above ncx)
+      while (bin_lowY < first) // shift bin by +ncy
+	bin_lowY = ncy + bin_lowY;
+      while (bin_hiY > ncy) // shift bin by -ncy
+       	bin_hiY = bin_hiY - ncy;
+
+      /// use symmetric-to-bin bins to calculate average
+      bin_lowX = binX-i;  bin_hiX = binX+i;
+      /// check if need to consider bins on other side of spectrum
+      /// (ie. if bins below 1 or above ncx)
+      while (bin_lowX < first) // shift bin by +ncx
+        bin_lowX = ncx + bin_lowX;
+      while (bin_hiX > ncx) // shift bin by -ncx
+        bin_hiX = bin_hiX - ncx;
+
+      sum += h->GetBinContent(bin_lowX, bin_lowY) + h->GetBinContent(bin_hiX, bin_hiY); 
+    }
+  } 
+  /// average is sum over the # of bins used
+  return (sum)/((neighborsX * neighborsY) * 2);
+}
 
 //-----------------------------------------------------------//
 //----------------  ContentsWithinExpected ---------------------//
