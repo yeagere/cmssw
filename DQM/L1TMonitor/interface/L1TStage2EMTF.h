@@ -63,6 +63,32 @@ class L1TStage2EMTF : public DQMEDAnalyzer {
   MonitorElement* emtfMuonhwEta;
   MonitorElement* emtfMuonhwPhi;
   MonitorElement* emtfMuonhwQual;
+
+//=========QUALITY TESTER (added by Emma)=================
+  MonitorElement* emtfChamberStrip_QT[20]; //have to reallocate for two additional histograms
+  MonitorElement* emtfChamberStrip_QT_sqrt[20];
+  MonitorElement* emtfChamberStrip_QT_hot[20];
+
+  MonitorElement* emtfChamberStrip_QT1D[20];
+  MonitorElement* emtfChamberStrip_QT_sqrt1D[20];
+  MonitorElement* emtfChamberStrip_QT_dead[20];
+
+  MonitorElement* emtfTrackBX_QT;
+  MonitorElement* emtfTrackBX_QT_sqrt;
+  MonitorElement* emtfTrackBX_QT_hot;
+  MonitorElement* emtfTrackBX_QT_dead;
+
+  MonitorElement* emtfTrackPhiCoarse_QT;
+  MonitorElement* emtfTrackPhiCoarse_QT_sqrt;
+  MonitorElement* emtfTrackPhiCoarse_QT_hot;
+  MonitorElement* emtfTrackPhiCoarse_QT_dead;
+
+  MonitorElement* emtfTrackPhiHighQuality_QT;
+  MonitorElement* emtfTrackPhiHighQuality_QT_sqrt;
+  MonitorElement* emtfTrackPhiHighQuality_QT_hot;
+  MonitorElement* emtfTrackPhiHighQuality_QT_dead;
+ //========================================
+
 };
 
 #endif
