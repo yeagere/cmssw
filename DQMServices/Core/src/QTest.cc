@@ -828,6 +828,7 @@ float NoisyChannel::runTest(const MonitorElement *me)
     {
       double contents = h->GetBinContent(bin);
       double average = getAverage(bin, h);
+        std::cout<<"1D average: "<<average<<"\n";
       bool failure = false;
       if (average != 0)
          failure = (((contents-average)/TMath::Abs(average)) > tolerance_);
