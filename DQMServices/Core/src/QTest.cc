@@ -828,9 +828,6 @@ float NoisyChannel::runTest(const MonitorElement *me)
     {
       double contents = h->GetBinContent(bin);
       double average = getAverage(bin, h);
-/*      if (average > 1.5) {
-        std::cout<<"1D average: "<<average<<"\n";
-      } */
       bool failure = false;
       if (average != 0)
          failure = (((contents-average)/TMath::Abs(average)) > tolerance_);
@@ -851,9 +848,7 @@ float NoisyChannel::runTest(const MonitorElement *me)
       for (binX = first; binX <= lastX; ++binX) {
         double contents = h->GetBinContent(binX, binY);
         double average = getAverage2D(binX, binY, nbinsX, nbinsY, h);
-	if (average > 1.5) {
-          std::cout<<"2D average: "<<average<<"\n";
-	} 
+        //std::cout<<"2D average: "<<average<<"\n";
         bool failure = false;
         if (average != 0)
            failure = (((contents-average)/TMath::Abs(average)) > tolerance_);
