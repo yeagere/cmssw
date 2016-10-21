@@ -130,33 +130,19 @@ void L1TStage2EMTF::bookHistograms(DQMStore::IBooker& ibooker, const edm::Run&, 
     emtfChamberStrip_QT[hist]->setAxisTitle("Chamber, " + label, 1);
     emtfChamberStrip_QT[hist]->setAxisTitle("Cathode Halfstrip", 2);
 
-    emtfChamberStrip_QT_sqrt[hist] = ibooker.book2D("emtfChamberStrip_QT_sqrt" + name, "EMTF Halfstrip QT " + label, n_xbins, 1, 1+n_xbins, n_ybins, yMin, yMax);
-    emtfChamberStrip_QT_sqrt[hist]->setAxisTitle("Chamber, " + label, 1);
-    emtfChamberStrip_QT_sqrt[hist]->setAxisTitle("Cathode Halfstrip", 2);
-
     emtfChamberStrip_QT_hot[hist] = ibooker.book2D("emtfChamberStrip_QT_hot" + name, "EMTF Halfstrip QT Hot " + label, n_xbins, 1, 1+n_xbins, n_ybins, yMin, yMax);
     emtfChamberStrip_QT_hot[hist]->setAxisTitle("Chamber, " + label, 1);
     emtfChamberStrip_QT_hot[hist]->setAxisTitle("Cathode Halfstrip", 2);
 
-    //for all noisychannel inverted histograms with 1 bin for every column
-    emtfChamberStrip_QT1D[hist] = ibooker.book1D("emtfChamberStrip_QT1D" + name, "EMTF Halfstrip QT 1D " + label,  n_xbins, 1, 1+n_xbins);
-    emtfChamberStrip_QT1D[hist]->setAxisTitle("Chamber, " + label, 1);
-
-    emtfChamberStrip_QT_sqrt1D[hist] = ibooker.book1D("emtfChamberStrip_QT_sqrt1D" + name, "EMTF Halfstrip QT 1D " + label, n_xbins, 1, 1+n_xbins);
-    emtfChamberStrip_QT_sqrt1D[hist]->setAxisTitle("Chamber, " + label, 1);
-
-    emtfChamberStrip_QT_dead[hist] = ibooker.book1D("emtfChamberStrip_QT_dead" + name, "EMTF Halfstrip QT Dead " + label, n_xbins, 1, 1+n_xbins);
+    emtfChamberStrip_QT_dead[hist] = ibooker.book2D("emtfChamberStrip_QT_dead" + name, "EMTF Halfstrip QT Dead " + label, n_xbins, 1, 1+n_xbins, n_ybins, yMin, yMax);
     emtfChamberStrip_QT_dead[hist]->setAxisTitle("Chamber, " + label, 1);
+    emtfChamberStrip_QT_dead[hist]->setAxisTitle("Cathode Halfstrip", 2); // 2D dead histogram
 
-/*    for (int bin = 1; bin <= n_xbins; ++bin) {
+    for (int bin = 1; bin <= n_xbins; ++bin) {
       emtfChamberStrip_QT[hist]->setBinLabel(bin, std::to_string(bin), 1);
-      emtfChamberStrip_QT_sqrt[hist]->setBinLabel(bin, std::to_string(bin), 1);
       emtfChamberStrip_QT_hot[hist]->setBinLabel(bin, std::to_string(bin), 1);
-
-      emtfChamberStrip_QT1D[hist]->setBinLabel(bin, std::to_string(bin), 1);
-      emtfChamberStrip_QT_sqrt1D[hist]->setBinLabel(bin, std::to_string(bin), 1);
       emtfChamberStrip_QT_dead[hist]->setBinLabel(bin, std::to_string(bin), 1);
-    } */
+    } 
 //=============================================================================================================
 //=============================================================================================================
 
@@ -407,44 +393,32 @@ void L1TStage2EMTF::analyze(const edm::Event& e, const edm::EventSetup& c) {
 //====================CHAMBER STRIP============================================================================
     Double_t sumChamberStrip = 0;
     Double_t meanChamberStrip = 0;
-    Double_t sumChamberStrip1D = 0;
-    Double_t meanChamberStrip1D = 0;
 
     if (neighbor == 0) {
         emtfChamberStrip_QT[hist_index]->Fill(chamber, strip);
-        emtfChamberStrip_QT1D[hist_index]->Fill(chamber);
+//        emtfChamberStrip_QT1D[hist_index]->Fill(chamber);
     }
 
     for (int binX=1; binX <= emtfChamberStrip_QT[hist_index]->getTH1()->GetNbinsX(); binX++) {
       for (int binY=1; binY <= emtfChamberStrip_QT[hist_index]->getTH1()->GetNbinsY(); binY++) {	
-        emtfChamberStrip_QT_sqrt[hist_index]->getTH1()->SetBinContent(binX, binY, sqrt(emtfChamberStrip_QT[hist_index]->getTH1()->GetBinContent(binX, binY)));
-
-        sumChamberStrip += emtfChamberStrip_QT_sqrt[hist_index]->getTH1()->GetBinContent(binX, binY); 
+//        sumChamberStrip += sqrt(emtfChamberStrip_QT[hist_index]->getTH1()->GetBinContent(binX, binY));
+        sumChamberStrip += sqrt(2 + emtfChamberStrip_QT[hist_index]->getTH1()->GetBinContent(binX, binY)); 
       }
-    }
-
-    for (int binX=1; binX <= emtfChamberStrip_QT1D[hist_index]->getTH1()->GetNbinsX(); binX++) {	
-	    emtfChamberStrip_QT_sqrt1D[hist_index]->getTH1()->SetBinContent(binX, sqrt(emtfChamberStrip_QT1D[hist_index]->getTH1()->GetBinContent(binX)));
-	    sumChamberStrip1D += emtfChamberStrip_QT_sqrt1D[hist_index]->getTH1()->GetBinContent(binX);
     }
 
     //find average of each histogram to reset average to 1
-    meanChamberStrip = sumChamberStrip /((emtfChamberStrip_QT[hist_index]->getTH1()->GetNbinsX())*(emtfChamberStrip_QT[hist_index]->getTH1()->GetNbinsY()));
+    meanChamberStrip = sumChamberStrip/((emtfChamberStrip_QT[hist_index]->getTH1()->GetNbinsX())*(emtfChamberStrip_QT[hist_index]->getTH1()->GetNbinsY()));
 
-    meanChamberStrip1D = sumChamberStrip1D /(emtfChamberStrip_QT1D[hist_index]->getTH1()->GetNbinsX());
+//    meanChamberStrip1D = sumChamberStrip1D /(emtfChamberStrip_QT1D[hist_index]->getTH1()->GetNbinsX());
 
     for (int binX=1; binX <= emtfChamberStrip_QT[hist_index]->getTH1()->GetNbinsX(); binX++) {
       for (int binY=1; binY <= emtfChamberStrip_QT[hist_index]->getTH1()->GetNbinsY(); binY++) {
-	emtfChamberStrip_QT_hot[hist_index]->getTH1()->SetBinContent(binX, binY, 1 - meanChamberStrip + emtfChamberStrip_QT_sqrt[hist_index]->getTH1()->GetBinContent(binX, binY));
+//	emtfChamberStrip_QT_hot[hist_index]->getTH1()->SetBinContent(binX, binY, 1 - meanChamberStrip + sqrt(emtfChamberStrip_QT[hist_index]->getTH1()->GetBinContent(binX, binY)));
+	emtfChamberStrip_QT_hot[hist_index]->getTH1()->SetBinContent(binX, binY, sqrt(2 + emtfChamberStrip_QT[hist_index]->getTH1()->GetBinContent(binX, binY))/meanChamberStrip);
+
+//	emtfChamberStrip_QT_hot[hist_index]->getTH1()->SetBinContent(binX, binY, 1 + meanChamberStrip - sqrt(emtfChamberStrip_QT[hist_index]->getTH1()->GetBinContent(binX, binY)));
+	emtfChamberStrip_QT_dead[hist_index]->getTH1()->SetBinContent(binX, binY, 2 - sqrt(2 + emtfChamberStrip_QT[hist_index]->getTH1()->GetBinContent(binX, binY))/meanChamberStrip);
       }
-    }
-
-    for (int binX=1; binX <= emtfChamberStrip_QT1D[hist_index]->getTH1()->GetNbinsX(); binX++) {
-	emtfChamberStrip_QT_dead[hist_index]->getTH1()->SetBinContent(binX, 1 -(emtfChamberStrip_QT_sqrt1D[hist_index]->getTH1()->GetBinContent(binX) - meanChamberStrip1D));
-
-      if (hist_index == 11) {
-        std::cout<<"For a chamber with xbins: "<<emtfChamberStrip_QT1D[hist_index]->getTH1()->GetNbinsX()<<" and mean of the chamber strip is: "<<meanChamberStrip1D<<", initial bin value of: "<<emtfChamberStrip_QT_sqrt1D[hist_index]->getTH1()->GetBinContent(binX)<<" we get a rescaled value: "<<emtfChamberStrip_QT_dead[hist_index]->getTH1()->GetBinContent(binX)<<"\n"; 
-      } 
     }
 
 //=============================================================================================================
