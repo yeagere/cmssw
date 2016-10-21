@@ -66,11 +66,7 @@ class L1TStage2EMTF : public DQMEDAnalyzer {
 
 //=========QUALITY TESTER (added by Emma)=================
   MonitorElement* emtfChamberStrip_QT[20]; //have to reallocate for two additional histograms
-  MonitorElement* emtfChamberStrip_QT_sqrt[20];
   MonitorElement* emtfChamberStrip_QT_hot[20];
-
-  MonitorElement* emtfChamberStrip_QT1D[20];
-  MonitorElement* emtfChamberStrip_QT_sqrt1D[20];
   MonitorElement* emtfChamberStrip_QT_dead[20];
 
   MonitorElement* emtfTrackBX_QT;
