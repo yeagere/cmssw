@@ -196,13 +196,6 @@ void L1TStage2EMTF::bookHistograms(DQMStore::IBooker& ibooker, const edm::Run&, 
     emtfTrackBX_QT->setBinLabel(12 - i, std::to_string(6 - i) + " (+)", 1);
   }
 
-  emtfTrackBX_QT_sqrt = ibooker.book1D("emtfTrackBX_QT_sqrt", "EMTF Track BX QT", 12, -6, 6);
-  emtfTrackBX_QT_sqrt->setAxisTitle("Sector (Endcap)", 1);
-  for (int i = 0; i < 6; ++i) {
-    emtfTrackBX_QT_sqrt->setBinLabel(i + 1, std::to_string(6 - i) + " (-)", 1);
-    emtfTrackBX_QT_sqrt->setBinLabel(12 - i, std::to_string(6 - i) + " (+)", 1);
-  }
-
   emtfTrackBX_QT_hot = ibooker.book1D("emtfTrackBX_QT_hot", "EMTF Track BX QT Hot", 12, -6, 6);
   emtfTrackBX_QT_hot->setAxisTitle("Sector (Endcap)", 1);
   for (int i = 0; i < 6; ++i) {
@@ -240,9 +233,6 @@ void L1TStage2EMTF::bookHistograms(DQMStore::IBooker& ibooker, const edm::Run&, 
   emtfTrackPhiCoarse_QT = ibooker.book1D("emtfTrackPhiCoarse_QT", "EMTF Track #phi (coarse) QT", 32, xMin, xMax);
   emtfTrackPhiCoarse_QT->setAxisTitle("Track #phi", 1);
 
-  emtfTrackPhiCoarse_QT_sqrt = ibooker.book1D("emtfTrackPhiCoarse_QT_sqrt", "EMTF Track #phi (coarse) QT", 32, xMin, xMax);
-  emtfTrackPhiCoarse_QT_sqrt->setAxisTitle("Track #phi", 1);
-
   emtfTrackPhiCoarse_QT_hot = ibooker.book1D("emtfTrackPhiCoarse_QT_hot", "EMTF Track #phi (coarse) QT Hot", 32, xMin, xMax);
   emtfTrackPhiCoarse_QT_hot->setAxisTitle("Track #phi", 1);
 
@@ -251,9 +241,6 @@ void L1TStage2EMTF::bookHistograms(DQMStore::IBooker& ibooker, const edm::Run&, 
 
   emtfTrackPhiHighQuality_QT = ibooker.book1D("emtfTrackPhiHighQuality_QT", "EMTF High Quality #phi QT", 128, xMin, xMax);
   emtfTrackPhiHighQuality_QT->setAxisTitle("Track #phi (High Quality)", 1);
-
-  emtfTrackPhiHighQuality_QT_sqrt = ibooker.book1D("emtfTrackPhiHighQuality_QT_sqrt", "EMTF High Quality #phi QT", 128, xMin, xMax);
-  emtfTrackPhiHighQuality_QT_sqrt->setAxisTitle("Track #phi (High Quality)", 1);
 
   emtfTrackPhiHighQuality_QT_hot = ibooker.book1D("emtfTrackPhiHighQuality_QT_hot", "EMTF High Quality #phi QT Hot", 128, xMin, xMax);
   emtfTrackPhiHighQuality_QT_hot->setAxisTitle("Track #phi (High Quality)", 1);
@@ -396,7 +383,6 @@ void L1TStage2EMTF::analyze(const edm::Event& e, const edm::EventSetup& c) {
 
     if (neighbor == 0) {
         emtfChamberStrip_QT[hist_index]->Fill(chamber, strip);
-//        emtfChamberStrip_QT1D[hist_index]->Fill(chamber);
     }
 
     for (int binX=1; binX <= emtfChamberStrip_QT[hist_index]->getTH1()->GetNbinsX(); binX++) {
@@ -416,7 +402,7 @@ void L1TStage2EMTF::analyze(const edm::Event& e, const edm::EventSetup& c) {
 //	emtfChamberStrip_QT_hot[hist_index]->getTH1()->SetBinContent(binX, binY, 1 - meanChamberStrip + sqrt(emtfChamberStrip_QT[hist_index]->getTH1()->GetBinContent(binX, binY)));
 	emtfChamberStrip_QT_hot[hist_index]->getTH1()->SetBinContent(binX, binY, sqrt(2 + emtfChamberStrip_QT[hist_index]->getTH1()->GetBinContent(binX, binY))/meanChamberStrip);
 
-//	emtfChamberStrip_QT_hot[hist_index]->getTH1()->SetBinContent(binX, binY, 1 + meanChamberStrip - sqrt(emtfChamberStrip_QT[hist_index]->getTH1()->GetBinContent(binX, binY)));
+//	emtfChamberStrip_QT_dead[hist_index]->getTH1()->SetBinContent(binX, binY, 1 + meanChamberStrip - sqrt(emtfChamberStrip_QT[hist_index]->getTH1()->GetBinContent(binX, binY)));
 	emtfChamberStrip_QT_dead[hist_index]->getTH1()->SetBinContent(binX, binY, 2 - sqrt(2 + emtfChamberStrip_QT[hist_index]->getTH1()->GetBinContent(binX, binY))/meanChamberStrip);
       }
     }
@@ -468,14 +454,13 @@ void L1TStage2EMTF::analyze(const edm::Event& e, const edm::EventSetup& c) {
 
     for (int binX=1; binX <= emtfTrackBX_QT->getTH1()->GetNbinsX(); binX++) 
     {
-	emtfTrackBX_QT_sqrt->getTH1()->SetBinContent(binX, sqrt(emtfTrackBX_QT->getTH1()->GetBinContent(binX)));	
-	sumTrackBX += emtfTrackBX_QT_sqrt->getTH1()->GetBinContent(binX);
+	sumTrackBX += sqrt(emtfTrackBX_QT->getTH1()->GetBinContent(binX));
     }
 
     meanTrackBX = sumTrackBX / emtfTrackBX_QT->getTH1()->GetNbinsX();
     for (int binX=1; binX <= emtfTrackBX_QT->getTH1()->GetNbinsX(); binX++) {
-	emtfTrackBX_QT_hot->getTH1()->SetBinContent(binX, 1 - meanTrackBX + emtfTrackBX_QT_sqrt->getTH1()->GetBinContent(binX));
-	emtfTrackBX_QT_dead->getTH1()->SetBinContent(binX, 1 + meanTrackBX - emtfTrackBX_QT_sqrt->getTH1()->GetBinContent(binX));
+	emtfTrackBX_QT_hot->getTH1()->SetBinContent(binX, 1 - meanTrackBX + sqrt(emtfTrackBX_QT->getTH1()->GetBinContent(binX)));
+	emtfTrackBX_QT_dead->getTH1()->SetBinContent(binX, 1 + meanTrackBX - sqrt(emtfTrackBX_QT->getTH1()->GetBinContent(binX)));
     }
 //=============================================================================================================
 //=============================================================================================================
@@ -498,26 +483,24 @@ void L1TStage2EMTF::analyze(const edm::Event& e, const edm::EventSetup& c) {
 
     for (int binX=1; binX <= emtfTrackPhiCoarse_QT->getTH1()->GetNbinsX(); binX++) 
     {
-	emtfTrackPhiCoarse_QT_sqrt->getTH1()->SetBinContent(binX, sqrt(emtfTrackPhiCoarse_QT->getTH1()->GetBinContent(binX)));	
-	sumPhiCoarse += emtfTrackPhiCoarse_QT_sqrt->getTH1()->GetBinContent(binX);
+	sumPhiCoarse += sqrt(emtfTrackPhiCoarse_QT->getTH1()->GetBinContent(binX));
     }
 
     meanPhiCoarse = sumPhiCoarse / emtfTrackPhiCoarse_QT->getTH1()->GetNbinsX();
     for (int binX=1; binX <= emtfTrackPhiCoarse_QT->getTH1()->GetNbinsX(); binX++) {
-	emtfTrackPhiCoarse_QT_hot->getTH1()->SetBinContent(binX, 1 - meanPhiCoarse + emtfTrackPhiCoarse_QT_sqrt->getTH1()->GetBinContent(binX));
-	emtfTrackPhiCoarse_QT_dead->getTH1()->SetBinContent(binX, 1 + meanPhiCoarse - emtfTrackPhiCoarse_QT_sqrt->getTH1()->GetBinContent(binX));
+	emtfTrackPhiCoarse_QT_hot->getTH1()->SetBinContent(binX, 1 - meanPhiCoarse + sqrt(emtfTrackPhiCoarse_QT->getTH1()->GetBinContent(binX)));
+	emtfTrackPhiCoarse_QT_dead->getTH1()->SetBinContent(binX, 1 + meanPhiCoarse - sqrt(emtfTrackPhiCoarse_QT->getTH1()->GetBinContent(binX)));
     }
     
     for (int binX=1; binX <= emtfTrackPhiHighQuality_QT->getTH1()->GetNbinsX(); binX++) 
     {
-	emtfTrackPhiHighQuality_QT_sqrt->getTH1()->SetBinContent(binX, sqrt(emtfTrackPhiHighQuality_QT->getTH1()->GetBinContent(binX)));
-	sumPhiHighQuality += emtfTrackPhiHighQuality_QT_sqrt->getTH1()->GetBinContent(binX); 	
+	sumPhiHighQuality += sqrt(emtfTrackPhiHighQuality_QT->getTH1()->GetBinContent(binX)); 	
     }
 
     meanPhiHighQuality = sumPhiHighQuality / emtfTrackPhiHighQuality_QT->getTH1()->GetNbinsX();
-    for (int binX=1; binX <= emtfTrackPhiHighQuality_QT_sqrt->getTH1()->GetNbinsX(); binX++) {
-	emtfTrackPhiHighQuality_QT_hot->getTH1()->SetBinContent(binX, 1 - meanPhiHighQuality + emtfTrackPhiHighQuality_QT_sqrt->getTH1()->GetBinContent(binX));
-	emtfTrackPhiHighQuality_QT_dead->getTH1()->SetBinContent(binX, 1 + meanPhiHighQuality - emtfTrackPhiHighQuality_QT_sqrt->getTH1()->GetBinContent(binX));
+    for (int binX=1; binX <= emtfTrackPhiHighQuality_QT->getTH1()->GetNbinsX(); binX++) {
+	emtfTrackPhiHighQuality_QT_hot->getTH1()->SetBinContent(binX, 1 - meanPhiHighQuality + sqrt(emtfTrackPhiHighQuality_QT->getTH1()->GetBinContent(binX)));
+	emtfTrackPhiHighQuality_QT_dead->getTH1()->SetBinContent(binX, 1 + meanPhiHighQuality - sqrt(emtfTrackPhiHighQuality_QT->getTH1()->GetBinContent(binX)));
     } 
 //=============================================================================================================
 //=============================================================================================================
