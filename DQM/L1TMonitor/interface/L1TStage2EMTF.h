@@ -70,17 +70,14 @@ class L1TStage2EMTF : public DQMEDAnalyzer {
   MonitorElement* emtfChamberStrip_QT_dead[20];
 
   MonitorElement* emtfTrackBX_QT;
-  MonitorElement* emtfTrackBX_QT_sqrt;
   MonitorElement* emtfTrackBX_QT_hot;
   MonitorElement* emtfTrackBX_QT_dead;
 
   MonitorElement* emtfTrackPhiCoarse_QT;
-  MonitorElement* emtfTrackPhiCoarse_QT_sqrt;
   MonitorElement* emtfTrackPhiCoarse_QT_hot;
   MonitorElement* emtfTrackPhiCoarse_QT_dead;
 
   MonitorElement* emtfTrackPhiHighQuality_QT;
-  MonitorElement* emtfTrackPhiHighQuality_QT_sqrt;
   MonitorElement* emtfTrackPhiHighQuality_QT_hot;
   MonitorElement* emtfTrackPhiHighQuality_QT_dead;
  //========================================
