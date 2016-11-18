@@ -3,24 +3,20 @@ import FWCore.ParameterSet.Config as cms
 source = cms.Source(
     "PoolSource",
     fileNames = cms.untracked.vstring(
-	# run 281613 added by Emma
-	#"/store/express/Run2016H/ExpressPhysics/FEVT/Express-v2/000/281/613/00000/003CF22A-FA82-E611-B844-02163E0119BD.root",
-	#"/store/express/Run2016H/ExpressPhysics/FEVT/Express-v2/000/281/613/00000/00415F47-F882-E611-9B36-FA163E4FF519.root", 
-	#"/store/express/Run2016H/ExpressPhysics/FEVT/Express-v2/000/281/613/00000/0041AF2C-FA82-E611-AAB1-02163E0143F2.root",
-	#"/store/express/Run2016H/ExpressPhysics/FEVT/Express-v2/000/281/613/00000/00D95357-F282-E611-A6B6-02163E0143CB.root",
-	#"/store/express/Run2016H/ExpressPhysics/FEVT/Express-v2/000/281/613/00000/00F85B10-0883-E611-BDC5-02163E01341C.root",
-
-	# run 283478 added by Emma
-	"/store/express/Run2016H/ExpressPhysics/FEVT/Express-v2/000/283/478/00000/04406CE8-D495-E611-BD89-02163E0142E1.root",
-	"/store/express/Run2016H/ExpressPhysics/FEVT/Express-v2/000/283/478/00000/04EB6113-D795-E611-8F1A-02163E0144E2.root",
-	"/store/express/Run2016H/ExpressPhysics/FEVT/Express-v2/000/283/478/00000/06B6D69A-D695-E611-A17C-02163E011EBF.root",
-	"/store/express/Run2016H/ExpressPhysics/FEVT/Express-v2/000/283/478/00000/06CCDF07-D795-E611-B164-02163E0133FD.root",
-	"/store/express/Run2016H/ExpressPhysics/FEVT/Express-v2/000/283/478/00000/06D1CB45-D595-E611-914A-02163E01389B.root"
+	# run 283964 added by Emma
+	"/store/express/Run2016H/ExpressPhysics/FEVT/Express-v2/000/283/964/00000/00673035-E79A-E611-B12D-02163E012AC7.root",
+	"/store/express/Run2016H/ExpressPhysics/FEVT/Express-v2/000/283/964/00000/006CF568-E99A-E611-A3B2-02163E011DBA.root",
+	"/store/express/Run2016H/ExpressPhysics/FEVT/Express-v2/000/283/964/00000/00706973-E99A-E611-B7C9-02163E01221D.root",
+	"/store/express/Run2016H/ExpressPhysics/FEVT/Express-v2/000/283/964/00000/00FDE9C7-E69A-E611-B262-02163E011B12.root",
+	"/store/express/Run2016H/ExpressPhysics/FEVT/Express-v2/000/283/964/00000/00FE06BD-EC9A-E611-BBD3-02163E0137A4.root",
+	"/store/express/Run2016H/ExpressPhysics/FEVT/Express-v2/000/283/964/00000/02347858-E99A-E611-AEEA-02163E0143F9.root",
+	"/store/express/Run2016H/ExpressPhysics/FEVT/Express-v2/000/283/964/00000/025925C4-EC9A-E611-A973-02163E0142B0.root",
+	"/store/express/Run2016H/ExpressPhysics/FEVT/Express-v2/000/283/964/00000/04664A96-E69A-E611-967A-02163E0128DC.root",
     )
 )
 
 maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32(-1)
+    input = cms.untracked.int32(1000)
 )
 
 # Parameters for runType
