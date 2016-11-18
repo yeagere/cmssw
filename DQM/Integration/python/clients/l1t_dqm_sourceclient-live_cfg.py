@@ -119,7 +119,7 @@ process.schedule = cms.Schedule(process.rawToDigiPath,
 #
 # turn on verbosity in L1TEventInfoClient
 #
-# process.l1tEventInfoClient.verbose = cms.untracked.bool(True)
+#process.l1tEventInfoClient.verbose = cms.untracked.bool(True)
 
 
 # remove module(s) or system sequence from l1tMonitorPath
