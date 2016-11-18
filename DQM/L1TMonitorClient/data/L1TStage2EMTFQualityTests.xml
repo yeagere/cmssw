@@ -1,8 +1,8 @@
 <TESTSCONFIGURATION>
 
-<!-- Tests for *emtfChamber hot  -->
+<!-- Tests for *emtfChamber  -->
 
-    <QTEST name="NoisyChannel_Chamber_Hot">
+    <QTEST name="NoisyChannel_Chamber">
 	<TYPE>NoisyChannel</TYPE>	
 	<PARAM name="tolerance">.5</PARAM>
 	<PARAM name="neighbours">0</PARAM>
@@ -10,22 +10,8 @@
 	<PARAM name="warning">0.70</PARAM>
     </QTEST>
 
-    <LINK name="*emtfChamberStrip_QT_hot*">
-        <TestName activate="true">NoisyChannel_Chamber_Hot</TestName>
-    </LINK> 
-
-<!-- Tests for *emtfChamber dead  -->
-
-    <QTEST name="NoisyChannel_Chamber_Dead">
-	<TYPE>NoisyChannel</TYPE>	
-	<PARAM name="tolerance">.5</PARAM>
-	<PARAM name="neighbours">36</PARAM>
-	<PARAM name="error">0.50</PARAM>
-	<PARAM name="warning">0.70</PARAM>
-    </QTEST>
-
-    <LINK name="*emtfChamberStrip_QT_dead*">
-        <TestName activate="true">NoisyChannel_Chamber_Dead</TestName> 
+    <LINK name="*emtfChamberStrip_QT*">
+        <TestName activate="true">NoisyChannel_Chamber</TestName>
     </LINK> 
 
 <!-- Tests for emtfErrors  -->
@@ -52,7 +38,7 @@
 	<PARAM name="warning">0.70</PARAM>
     </QTEST>
 
-    <LINK name="*emtfTrackBX*">
+    <LINK name="*emtfTrackBX_QT*">
         <TestName activate="true">NoisyChannel_TrackBX</TestName>
     </LINK>  
 
@@ -66,7 +52,7 @@
 	<PARAM name="warning">0.70</PARAM>
     </QTEST>
 
-    <LINK name="*emtfTrackPhi*">
+    <LINK name="*emtfTrackPhi_QT*">
         <TestName activate="true">NoisyChannel_TrackPhi</TestName>
     </LINK> 
 
