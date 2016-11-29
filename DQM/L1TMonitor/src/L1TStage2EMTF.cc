@@ -1,9 +1,30 @@
 #include <string>
 #include <vector>
 
-#include "TMath.h" //added by Emma
-Double_t pi=TMath::Pi(); //added by Emma
-#include "DQMServices/Core/interface/QReport.h" //added by Emma
+//_____________________ADDED BY EMMA___________________________________________________________________________
+#include <stdio.h>
+#include <sstream>
+#include <fstream>
+#include <iostream>
+#include <iomanip>
+
+#include <math.h>
+#include <memory>
+
+#include "FWCore/ServiceRegistry/interface/Service.h"
+#include "FWCore/ParameterSet/interface/ParameterSet.h"
+#include "FWCore/Framework/interface/EventSetup.h"
+#include "FWCore/MessageLogger/interface/MessageLogger.h"
+#include "FWCore/Utilities/interface/Exception.h"
+
+#include "DQMServices/Core/interface/QReport.h"
+#include "DQMServices/Core/interface/DQMStore.h"
+#include "DQMServices/Core/interface/DQMDefinitions.h"
+
+#include "TMath.h" 
+Double_t pi=TMath::Pi(); 
+//_____________________________________________________________________________________________________________
+
 
 #include "DQM/L1TMonitor/interface/L1TStage2EMTF.h"
 
@@ -23,7 +44,6 @@ void L1TStage2EMTF::dqmBeginRun(const edm::Run& r, const edm::EventSetup& c) {}
 void L1TStage2EMTF::beginLuminosityBlock(const edm::LuminosityBlock&, const edm::EventSetup&) {}
 
 void L1TStage2EMTF::bookHistograms(DQMStore::IBooker& ibooker, const edm::Run&, const edm::EventSetup&) {
-
   ibooker.setCurrentFolder(monitorDir);
 
   // DAQ Output Monitor Elements
@@ -125,10 +145,9 @@ void L1TStage2EMTF::bookHistograms(DQMStore::IBooker& ibooker, const edm::Run&, 
       emtfChamberWire[hist]->setBinLabel(bin, std::to_string(bin), 1);
     }
 
-//================QUALITY TESTER (added by Emma)===============================================================
-//================CHAMBER STRIP================================================================================
-  ibooker.setCurrentFolder(monitorDir + "/Quality Test Collection"); //book in subfolder
+//________________QUALITY TESTER (added by Emma)__CHAMBER STRIP________________________________________________
 
+  ibooker.setCurrentFolder(monitorDir + "/Quality Test Collection"); //book in subfolder
     emtfChamberStrip_QT[hist] = ibooker.book2D("emtfChamberStrip_QT" + name, "EMTF Halfstrip QT " + label, n_xbins, 1, 1+n_xbins, n_ybins, yMin, yMax);
     emtfChamberStrip_QT[hist]->setAxisTitle("Chamber, " + label, 1);
     emtfChamberStrip_QT[hist]->setAxisTitle("Cathode Halfstrip", 2);
@@ -147,8 +166,7 @@ void L1TStage2EMTF::bookHistograms(DQMStore::IBooker& ibooker, const edm::Run&, 
       emtfChamberStrip_QT_dead[hist]->setBinLabel(bin, std::to_string(bin), 1);
     } 
   ibooker.setCurrentFolder(monitorDir); //return to main folder
-//=============================================================================================================
-//=============================================================================================================
+//_____________________________________________________________________________________________________________
 
   emtfHitOccupancy = ibooker.book2D("emtfHitOccupancy", "EMTF Chamber Occupancy", 54, 1, 55, 10, -5, 5);
   emtfHitOccupancy->setAxisTitle("Sector (CSCID 1-9 Unlabelled)", 1);
@@ -190,8 +208,7 @@ void L1TStage2EMTF::bookHistograms(DQMStore::IBooker& ibooker, const edm::Run&, 
   }
 
 }
-//==================QUALITY TESTER (added by Emma)=============================================================
-//===================TRACK BX==================================================================================
+//__________________QUALITY TESTER (added by Emma)___TRACK BX__________________________________________________
   ibooker.setCurrentFolder(monitorDir + "/Quality Test Collection"); //book in subfolder
 
   emtfTrackBX_QT = ibooker.book1D("emtfTrackBX_QT", "EMTF Track BX QT", 12, -6, 6);
@@ -216,8 +233,7 @@ void L1TStage2EMTF::bookHistograms(DQMStore::IBooker& ibooker, const edm::Run&, 
   }
 
   ibooker.setCurrentFolder(monitorDir); //return to main folder
-//=============================================================================================================
-//=============================================================================================================
+//_____________________________________________________________________________________________________________
 
   emtfTrackPt = ibooker.book1D("emtfTrackPt", "EMTF Track p_{T}", 256, 1, 257);
   emtfTrackPt->setAxisTitle("Track p_{T} [GeV]", 1);
@@ -231,8 +247,7 @@ void L1TStage2EMTF::bookHistograms(DQMStore::IBooker& ibooker, const edm::Run&, 
   emtfTrackPhiHighQuality = ibooker.book1D("emtfTrackPhiHighQuality", "EMTF High Quality #phi", 126, -3.15, 3.15);
   emtfTrackPhiHighQuality->setAxisTitle("Track #phi (High Quality)", 1);
 
-//==================QUALITY TESTER (added by Emma)=============================================================
-//=================TRACK PHI===================================================================================
+//__________________QUALITY TESTER (added by Emma)___TRACK PHI_________________________________________________
   ibooker.setCurrentFolder(monitorDir + "/Quality Test Collection"); //book in subfolder
 
   Double_t xMin = -(63.0/64.0)*pi;
@@ -247,8 +262,7 @@ void L1TStage2EMTF::bookHistograms(DQMStore::IBooker& ibooker, const edm::Run&, 
   emtfTrackPhi_QT_dead = ibooker.book1D("emtfTrackPhi_QT_dead", "EMTF Track #phi QT Dead", 128, xMin, xMax);
   emtfTrackPhi_QT_dead->setAxisTitle("Track #phi", 1);
   ibooker.setCurrentFolder(monitorDir); //return to main folder
-//=============================================================================================================
-//=============================================================================================================
+//_____________________________________________________________________________________________________________
 
   emtfTrackOccupancy = ibooker.book2D("emtfTrackOccupancy", "EMTF Track Occupancy", 100, -2.5, 2.5, 126, -3.15, 3.15);
   emtfTrackOccupancy->setAxisTitle("#eta", 1);
@@ -295,34 +309,20 @@ void L1TStage2EMTF::bookHistograms(DQMStore::IBooker& ibooker, const edm::Run&, 
     emtfMuonhwQual->setBinLabel(bin, std::to_string(bin - 1), 1);
   }
 
-//==================QUALITY TESTER (added by Emma)=============================================================
-//=============================================================================================================
+//_____________________QUALITY TESTER (added by Emma___________________________________________________________
   ibooker.setCurrentFolder(monitorDir); //book in main folder
-  int nBinsY = 20;
+  std::vector<std::string> chamber_name = {"42", "41", "32", "31", "22", "21", "13", "12", "11b", "11a"};
 
-//  MonitorElement* me = igetter.get(DQM/L1TMonitorClient/data/L1TStage2QualityTests.xml);
-//  const QReport * myQReport = me->getQReport("NoisyChannel_Chamber"); //get QReport associated to your ME 
-// int qtstatus  = myQReport->getStatus();   // get QT status value (see table below)
-  //copied from line ~271
-//  std::cout<<qtstatus;
+  emtfQualityTester = ibooker.book1D("emtfQualityTester", "Report Summary Map",23, 0, 23);
 
-  emtfQualityTester = ibooker.book2D("emtfQualityTester", "Quality Test Results", 2, 1, 3, nBinsY, 1, nBinsY + 1);
-
-   emtfQualityTester->setAxisTitle("", 1);
-   emtfQualityTester->setAxisTitle("", 2);
-
-   emtfQualityTester->setBinLabel(1, "Histogram", 1);
-   emtfQualityTester->setBinLabel(2, "QT Result", 1);
-   emtfQualityTester->setBinLabel(1, "More 1", 2);
-   emtfQualityTester->setBinLabel(1, "More 2", 3);
-   emtfQualityTester->setBinLabel(1, "More 3", 4);
-   emtfQualityTester->setBinLabel(1, "More 4", 5);
-
-
-
-
-//=============================================================================================================
-//=============================================================================================================
+  for (int i = 1; i < 11; ++i) {
+    emtfQualityTester->setBinLabel(i, "Chamber Strip ME+"+chamber_name[i - 1]);
+    emtfQualityTester->setBinLabel(21 - i, "Chamber Strip ME-"+chamber_name[i - 1]);
+  }
+  emtfQualityTester->setBinLabel(21, "Track BX");
+  emtfQualityTester->setBinLabel(22, "Track Phi");
+  emtfQualityTester->setBinLabel(23, "Error");
+//_____________________________________________________________________________________________________________
 
 }
 
@@ -406,29 +406,27 @@ void L1TStage2EMTF::analyze(const edm::Event& e, const edm::EventSetup& c) {
     emtfChamberStrip[hist_index]->Fill(chamber, strip);
     emtfChamberWire[hist_index]->Fill(chamber, wire);
 
-//=====================QUALITY TESTER (added by Emma)==========================================================
-//====================CHAMBER STRIP============================================================================
-    Double_t sumChamberStrip = 0;
-    Double_t meanChamberStrip = 0;
+//_____________________QUALITY TESTER (added by Emma)___CHAMBER STRIP__________________________________________
+
+    int xMax = emtfChamberStrip_QT[hist_index]->getTH1()->GetNbinsX();
+    int yMax = emtfChamberStrip_QT[hist_index]->getTH1()->GetNbinsY();
 
     if (neighbor == 0) {
         emtfChamberStrip_QT[hist_index]->Fill(chamber, strip);
-        emtfChamberStrip_QT_hot[hist_index]->Fill(chamber, strip);
     }
-    for (int binX=1; binX <= emtfChamberStrip_QT_hot[hist_index]->getTH1()->GetNbinsX(); binX++) {
-      for (int binY=1; binY <= emtfChamberStrip_QT_hot[hist_index]->getTH1()->GetNbinsY(); binY++) {	
-        sumChamberStrip += sqrt(2 + emtfChamberStrip_QT_hot[hist_index]->getTH1()->GetBinContent(binX, binY)); 
+
+    double meanChamberStrip = emtfChamberStrip_QT[hist_index]->getTH1()->Integral() /(xMax*yMax);
+
+    int minValue = emtfChamberStrip_QT[hist_index]->getTH1()->GetMinimum(); 
+    int maxValue = emtfChamberStrip_QT[hist_index]->getTH1()->GetMaximum();
+
+    for (int binX=1; binX <= xMax; binX++) {
+      for (int binY=1; binY <= yMax; binY++) {
+	emtfChamberStrip_QT_dead[hist_index]->getTH1()->SetBinContent(binX, binY, 1 + sqrt((meanChamberStrip-minValue)/(maxValue - minValue)) - sqrt((emtfChamberStrip_QT[hist_index]->getTH1()->GetBinContent(binX, binY) - minValue)/(maxValue - minValue)));
+	emtfChamberStrip_QT_hot[hist_index]->getTH1()->SetBinContent(binX, binY, 1 - sqrt((meanChamberStrip - minValue)/(maxValue - minValue)) + sqrt((emtfChamberStrip_QT[hist_index]->getTH1()->GetBinContent(binX, binY)-minValue)/(maxValue - minValue)));
       }
     }
-    meanChamberStrip = sumChamberStrip/((emtfChamberStrip_QT_hot[hist_index]->getTH1()->GetNbinsX())*(emtfChamberStrip_QT_hot[hist_index]->getTH1()->GetNbinsY()));
-    for (int binX=1; binX <= emtfChamberStrip_QT_hot[hist_index]->getTH1()->GetNbinsX(); binX++) {
-      for (int binY=1; binY <= emtfChamberStrip_QT_hot[hist_index]->getTH1()->GetNbinsY(); binY++) {
-	emtfChamberStrip_QT_hot[hist_index]->getTH1()->SetBinContent(binX, binY, sqrt(2 + emtfChamberStrip_QT_hot[hist_index]->getTH1()->GetBinContent(binX, binY))/meanChamberStrip);
-	emtfChamberStrip_QT_dead[hist_index]->getTH1()->SetBinContent(binX, binY, 2 - sqrt(2 + emtfChamberStrip_QT_hot[hist_index]->getTH1()->GetBinContent(binX, binY))/meanChamberStrip);
-      }
-    }
-//=============================================================================================================
-//=============================================================================================================
+//_____________________________________________________________________________________________________________
 
     if (Hit->Subsector() == 1) {
       emtfHitOccupancy->Fill(cscid + cscid_offset, endcap * (station - 0.5));
@@ -461,52 +459,44 @@ void L1TStage2EMTF::analyze(const edm::Event& e, const edm::EventSetup& c) {
 
     emtfTracknHits->Fill(Track->NumHits());
     emtfTrackBX->Fill(endcap * (sector - 0.5), Track->BX());
-//==================QUALITY TESTER (added by Emma)=============================================================
-//===================TRACK BX==================================================================================
-    Double_t sumTrackBX = 0; Double_t meanTrackBX;
+
+//__________________QUALITY TESTER (added by Emma)___TRACK BX__________________________________________________
+
     if (has_neighbor == 0) {
       if (Track->BX() == 0) {
         emtfTrackBX_QT->Fill(endcap * (sector - 0.5));
-        emtfTrackBX_QT_hot->Fill(endcap * (sector - 0.5));
       }
     }
-    for (int binX=1; binX <= emtfTrackBX_QT_hot->getTH1()->GetNbinsX(); binX++)
-    {
-	sumTrackBX += sqrt(emtfTrackBX_QT_hot->getTH1()->GetBinContent(binX));
+
+    double meanTrackBX = emtfTrackBX_QT->getTH1()->Integral() / emtfTrackBX_QT->getTH1()->GetNbinsX();
+
+
+    for (int binX=1; binX <= emtfTrackBX_QT->getTH1()->GetNbinsX(); binX++) {
+	emtfTrackBX_QT_dead->getTH1()->SetBinContent(binX, 1 + sqrt(meanTrackBX) - sqrt(emtfTrackBX_QT->getTH1()->GetBinContent(binX)));
+	emtfTrackBX_QT_hot->getTH1()->SetBinContent(binX, 1 - sqrt(meanTrackBX) + sqrt(emtfTrackBX_QT->getTH1()->GetBinContent(binX)));
     }
-    meanTrackBX = sumTrackBX / emtfTrackBX_QT_hot->getTH1()->GetNbinsX();
-    for (int binX=1; binX <= emtfTrackBX_QT_hot->getTH1()->GetNbinsX(); binX++) {
-	emtfTrackBX_QT_hot->getTH1()->SetBinContent(binX, 1 - meanTrackBX + sqrt(emtfTrackBX_QT_hot->getTH1()->GetBinContent(binX)));
-	emtfTrackBX_QT_dead->getTH1()->SetBinContent(binX, 1 + meanTrackBX - sqrt(emtfTrackBX_QT_hot->getTH1()->GetBinContent(binX)));
-    }
-//=============================================================================================================
-//=============================================================================================================
+//____________________________________________________________________________________________________________
+
     emtfTrackPt->Fill(Track->Pt());
     emtfTrackEta->Fill(eta);
     emtfTrackPhi->Fill(phi_glob_rad);
-//================QUALITY TESTER (added by Emma)============================================================
-//================TRACK PHI====================================================================================
-    Double_t shift = pi/64.0;
-    Double_t sumPhi = 0;
-    Double_t meanPhi;
+
+//________________QUALITY TESTER (added by Emma)___TRACK PHI__________________________________________________
+    double shift = pi/64.0;
+    int xMax = emtfTrackPhi_QT->getTH1()->GetNbinsX();
 
     if (has_neighbor == 0) 
     {
         if (mode == 15) emtfTrackPhi_QT->Fill(phi_glob_rad + shift);
-        if (mode == 15) emtfTrackPhi_QT_hot->Fill(phi_glob_rad + shift);
     }
-    for (int binX=1; binX <= emtfTrackPhi_QT_hot->getTH1()->GetNbinsX(); binX++) 
-    {
-	sumPhi += sqrt(emtfTrackPhi_QT_hot->getTH1()->GetBinContent(binX)); 	
-    }
-    meanPhi = sumPhi / emtfTrackPhi_QT_hot->getTH1()->GetNbinsX();
-    for (int binX=1; binX <= emtfTrackPhi_QT_hot->getTH1()->GetNbinsX(); binX++) {
-	emtfTrackPhi_QT_hot->getTH1()->SetBinContent(binX, 1 - meanPhi + sqrt(emtfTrackPhi_QT_hot->getTH1()->GetBinContent(binX)));
-	emtfTrackPhi_QT_dead->getTH1()->SetBinContent(binX, 1 + meanPhi - sqrt(emtfTrackPhi_QT_hot->getTH1()->GetBinContent(binX)));
 
+    double meanPhi = emtfTrackPhi_QT->getTH1()->Integral() / xMax;
+
+    for (int binX=1; binX <= xMax; binX++) {
+	emtfTrackPhi_QT_dead->getTH1()->SetBinContent(binX, 1 + sqrt(meanPhi) - sqrt(emtfTrackPhi_QT->getTH1()->GetBinContent(binX)));
+	emtfTrackPhi_QT_hot->getTH1()->SetBinContent(binX, 1 - sqrt(meanPhi) + sqrt(emtfTrackPhi_QT->getTH1()->GetBinContent(binX)));
     } 
-//=============================================================================================================
-//=============================================================================================================
+//____________________________________________________________________________________________________________
     emtfTrackOccupancy->Fill(eta, phi_glob_rad);
     emtfTrackMode->Fill(mode);
     emtfTrackQuality->Fill(quality);
@@ -527,7 +517,37 @@ void L1TStage2EMTF::analyze(const edm::Event& e, const edm::EventSetup& c) {
       emtfMuonhwQual->Fill(Muon->hwQual());
     }
   }
+//_____________________QUALITY TESTER__added by Emma___________________________________________________________
+
+const QReport * emtfTrackBXHotQReport = emtfTrackBX_QT_hot->getQReport("NoisyChannel_TrackBX"); //get QReport associated to your ME 
+//const QReport * emtfTrackBXHotQReport = emtfTrackBX_QT_hot->getQReport("DQMData/Run 277420/L1T2016/Run summary/L1TStage2EMTF/NoisyChannel_TrackBX");
+if(emtfTrackBXHotQReport) {
+ float qtresult = emtfTrackBXHotQReport->getQTresult(); // get QT result value
+ int qtstatus = emtfTrackBXHotQReport->getStatus() ; // get QT status value (see table below)
+ std::string qtmessage = emtfTrackBXHotQReport->getMessage() ; // get the whole QT result message
+ emtfQualityTester->getTH1()->SetBinContent(21,qtresult);
+ emtfQualityTester->getTH1()->SetBinContent(22,qtstatus);
+ emtfQualityTester->getTH1()->SetBinContent(2,500);
 }
+ emtfQualityTester->getTH1()->SetBinContent(1,500);
+
+//_____________________________________________________________________________________________________________
+}
+
+void L1TStage2EMTF::readQtResults(DQMStore::IBooker &ibooker, DQMStore::IGetter &igetter) {
+/*
+  const QReport * emtfTrackBXHotQReport = emtfTrackBX_QT_hot->getQReport("NoisyChannel_TrackBX"); //get QReport associated to your ME  
+  if(emtfTrackBXHotQReport) {
+   float qtresult = emtfTrackBXHotQReport->getQTresult(); // get QT result value
+   int qtstatus = emtfTrackBXHotQReport->getStatus() ; // get QT status value (see table below)
+   std::string qtmessage = emtfTrackBXHotQReport->getMessage() ; // get the whole QT result message
+   emtfQualityTester->getTH1()->SetBinContent(21,qtresult);
+   emtfQualityTester->getTH1()->SetBinContent(22,qtstatus);
+  }
+ emtfQualityTester->getTH1()->SetBinContent(1,500);
+*/
+}
+
 
 
 
