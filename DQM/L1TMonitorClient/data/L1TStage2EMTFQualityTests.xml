@@ -4,7 +4,7 @@
 
     <QTEST name="NoisyChannel_Chamber">
 	<TYPE>NoisyChannel</TYPE>	
-	<PARAM name="tolerance">.5</PARAM>
+	<PARAM name="tolerance">1</PARAM>
 	<PARAM name="neighbours">0</PARAM>
 	<PARAM name="error">0.50</PARAM>
 	<PARAM name="warning">0.70</PARAM>
