@@ -13,6 +13,34 @@
 #include "DataFormats/L1TMuon/interface/EMTFTrack.h"
 #include "DataFormats/L1TMuon/interface/RegionalMuonCand.h"
 
+//_______________________________ADDED BY EMMA____________________________________________________________
+//added by Emma for quality test readout from DQM/L1TMonitorClient/interface/L1TEventInfoClient
+// system include files
+#include <memory>
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <vector>
+
+// user include files
+#include "FWCore/Framework/interface/Frameworkfwd.h"
+#include "FWCore/Framework/interface/Event.h"
+#include "FWCore/Framework/interface/MakerMacros.h"
+#include <FWCore/Framework/interface/EDAnalyzer.h>
+#include "DQMServices/Core/interface/MonitorElement.h"
+#include "DQMServices/Core/interface/DQMEDHarvester.h"
+
+class DQMStore; //forward declarations
+/*
+class L1TStage2EMTF : public DQMEDHarvester {
+  public:
+    L1TStage2EMTF(const edm::ParameterSet&);
+    virtual ~L1TStage2EMTF();
+  private:
+    void readQtResults(DQMStore::IBooker &ibooker, DQMStore::IGetter &igetter); //added by Emma
+}
+*/
+//________________________________________________________________________________________________________
 
 class L1TStage2EMTF : public DQMEDAnalyzer {
 
@@ -26,9 +54,13 @@ class L1TStage2EMTF : public DQMEDAnalyzer {
   virtual void dqmBeginRun(const edm::Run&, const edm::EventSetup&);
   virtual void beginLuminosityBlock(const edm::LuminosityBlock&, const edm::EventSetup&);
   virtual void bookHistograms(DQMStore::IBooker&, const edm::Run&, const edm::EventSetup&) override;
+  //virtual void analyze(const edm::Event&, const edm::EventSetup&, DQMStore::IGetter &) override;
   virtual void analyze(const edm::Event&, const edm::EventSetup&) override;
+  void dqmEndLuminosityBlock(DQMStore::IBooker &ibooker, DQMStore::IGetter &igetter, const edm::LuminosityBlock&, const edm::EventSetup&); //added by Emma
 
  private:
+
+  void readQtResults(DQMStore::IBooker &ibooker, DQMStore::IGetter &igetter); //added by Emma
 
   edm::EDGetTokenT<l1t::EMTFDaqOutCollection> daqToken;
   edm::EDGetTokenT<l1t::EMTFHitCollection> hitToken;
