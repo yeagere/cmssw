@@ -755,7 +755,6 @@ void L1TEventInfoClient::readQtResults(DQMStore::IBooker &ibooker, DQMStore::IGe
         m_meReportSummaryMap->setBinContent(2, iMon - m_nrL1Systems + 1, summCont);
 
     }
-
 }
 
 
