@@ -4,14 +4,9 @@ source = cms.Source(
     "PoolSource",
     fileNames = cms.untracked.vstring(
 	# run 283964 added by Emma
-	"/store/express/Run2016H/ExpressPhysics/FEVT/Express-v2/000/283/964/00000/00673035-E79A-E611-B12D-02163E012AC7.root",
-	"/store/express/Run2016H/ExpressPhysics/FEVT/Express-v2/000/283/964/00000/006CF568-E99A-E611-A3B2-02163E011DBA.root",
-	"/store/express/Run2016H/ExpressPhysics/FEVT/Express-v2/000/283/964/00000/00706973-E99A-E611-B7C9-02163E01221D.root",
-	"/store/express/Run2016H/ExpressPhysics/FEVT/Express-v2/000/283/964/00000/00FDE9C7-E69A-E611-B262-02163E011B12.root",
-	"/store/express/Run2016H/ExpressPhysics/FEVT/Express-v2/000/283/964/00000/00FE06BD-EC9A-E611-BBD3-02163E0137A4.root",
-	"/store/express/Run2016H/ExpressPhysics/FEVT/Express-v2/000/283/964/00000/02347858-E99A-E611-AEEA-02163E0143F9.root",
-	"/store/express/Run2016H/ExpressPhysics/FEVT/Express-v2/000/283/964/00000/025925C4-EC9A-E611-A973-02163E0142B0.root",
-	"/store/express/Run2016H/ExpressPhysics/FEVT/Express-v2/000/283/964/00000/04664A96-E69A-E611-967A-02163E0128DC.root",
+	"/store/express/Run2016H/ExpressPhysics/FEVT/Express-v2/000/284/036/00000/5CFC345B-939B-E611-9C8F-02163E01418F.root",
+	"/store/express/Run2016H/ExpressPhysics/FEVT/Express-v2/000/284/036/00000/240B4D37-969B-E611-BDA3-FA163EDF9ED3.root",
+	"/store/express/Run2016H/ExpressPhysics/FEVT/Express-v2/000/284/036/00000/1EF69739-969B-E611-B90A-FA163EE5597C.root",
     )
 )
 
