@@ -14,4 +14,3 @@ l1TStage2EMTFQualityTests = cms.EDAnalyzer("QualityTester",
     verboseQT=cms.untracked.bool(True)
 )
 
-print "QUALITY TESTS HAVE BEEN CALLED"

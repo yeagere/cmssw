@@ -94,8 +94,9 @@ void L1TStage2EMTF::bookHistograms(DQMStore::IBooker& ibooker, const edm::Run&, 
 
   for (int hist = 0, i = 0; hist < 20; ++hist, i = hist % 10) { //added by Emma
 
-    int yMin;
-    int yMax;
+    int yMin = 0;
+    int yMax = 224;
+    int n_xbinsQT = 36;
 
     if (hist < 10) {
       name = "MENeg" + suffix_name[i];
@@ -112,7 +113,7 @@ void L1TStage2EMTF::bookHistograms(DQMStore::IBooker& ibooker, const edm::Run&, 
     } else {
       n_xbins = 36;
     } 
-
+/*
     if (hist == 6 || hist == 9 || hist == 10 || hist == 13) {
       yMin = 0;
       yMax = 128; //8 bins
@@ -123,7 +124,7 @@ void L1TStage2EMTF::bookHistograms(DQMStore::IBooker& ibooker, const edm::Run&, 
       yMin = 0;
       yMax = 160; //10 bins
     }
-
+*/
     n_ybins = (yMax-yMin)/16; //added by Emma
 
     emtfHitStrip[hist] = ibooker.book1D("emtfHitStrip" + name, "EMTF Halfstrip " + label, 256, 0, 256);
@@ -148,19 +149,19 @@ void L1TStage2EMTF::bookHistograms(DQMStore::IBooker& ibooker, const edm::Run&, 
 //________________QUALITY TESTER (added by Emma)__CHAMBER STRIP________________________________________________
 
   ibooker.setCurrentFolder(monitorDir + "/Quality Test Collection"); //book in subfolder
-    emtfChamberStrip_QT[hist] = ibooker.book2D("emtfChamberStrip_QT" + name, "EMTF Halfstrip QT " + label, n_xbins, 1, 1+n_xbins, n_ybins, yMin, yMax);
+    emtfChamberStrip_QT[hist] = ibooker.book2D("emtfChamberStrip_QT" + name, "EMTF Halfstrip QT " + label, n_xbinsQT, 1, 1+n_xbinsQT, n_ybins, yMin, yMax);
     emtfChamberStrip_QT[hist]->setAxisTitle("Chamber, " + label, 1);
     emtfChamberStrip_QT[hist]->setAxisTitle("Cathode Halfstrip", 2);
 
-    emtfChamberStrip_QT_hot[hist] = ibooker.book2D("emtfChamberStrip_QT_hot" + name, "EMTF Halfstrip QT Hot " + label, n_xbins, 1, 1+n_xbins, n_ybins, yMin, yMax);
+    emtfChamberStrip_QT_hot[hist] = ibooker.book2D("emtfChamberStrip_QT_hot" + name, "EMTF Halfstrip QT Hot " + label, n_xbinsQT, 1, 1+n_xbinsQT, n_ybins, yMin, yMax);
     emtfChamberStrip_QT_hot[hist]->setAxisTitle("Chamber, " + label, 1);
     emtfChamberStrip_QT_hot[hist]->setAxisTitle("Cathode Halfstrip", 2);
 
-    emtfChamberStrip_QT_dead[hist] = ibooker.book2D("emtfChamberStrip_QT_dead" + name, "EMTF Halfstrip QT Dead " + label, n_xbins, 1, 1+n_xbins, n_ybins, yMin, yMax);
+    emtfChamberStrip_QT_dead[hist] = ibooker.book2D("emtfChamberStrip_QT_dead" + name, "EMTF Halfstrip QT Dead " + label, n_xbinsQT, 1, 1+n_xbinsQT, n_ybins, yMin, yMax);
     emtfChamberStrip_QT_dead[hist]->setAxisTitle("Chamber, " + label, 1);
     emtfChamberStrip_QT_dead[hist]->setAxisTitle("Cathode Halfstrip", 2); // 2D dead histogram
 
-    for (int bin = 1; bin <= n_xbins; ++bin) {
+    for (int bin = 1; bin <= n_xbinsQT; ++bin) {
       emtfChamberStrip_QT[hist]->setBinLabel(bin, std::to_string(bin), 1);
       emtfChamberStrip_QT_hot[hist]->setBinLabel(bin, std::to_string(bin), 1);
       emtfChamberStrip_QT_dead[hist]->setBinLabel(bin, std::to_string(bin), 1);
@@ -408,24 +409,94 @@ void L1TStage2EMTF::analyze(const edm::Event& e, const edm::EventSetup& c) {
 
 //_____________________QUALITY TESTER (added by Emma)___CHAMBER STRIP__________________________________________
 
-    int xMax = emtfChamberStrip_QT[hist_index]->getTH1()->GetNbinsX();
-    int yMax = emtfChamberStrip_QT[hist_index]->getTH1()->GetNbinsY();
-
     if (neighbor == 0) {
         emtfChamberStrip_QT[hist_index]->Fill(chamber, strip);
     }
 
-    double meanChamberStrip = emtfChamberStrip_QT[hist_index]->getTH1()->Integral() /(xMax*yMax);
+for (int hist_index = 0, i = 0; hist_index < 20; ++hist_index, i = hist_index % 10) {
 
-    int minValue = emtfChamberStrip_QT[hist_index]->getTH1()->GetMinimum(); 
-    int maxValue = emtfChamberStrip_QT[hist_index]->getTH1()->GetMaximum();
+  int xMax, yMin, yMax;
+  int xMinFiller, yMinFiller, yMaxFiller;
+
+    if (hist_index < 6) { 
+      xMax = (i % 2) ? 18 : 36;
+      xMinFiller = xMax + 1;
+    } else if (hist_index > 13) {
+      xMax = ((i-1) % 2) ? 18 : 36;
+      xMinFiller = xMax + 1;
+    } else {
+      xMax = 36;
+      xMinFiller = xMax + 1;
+    }
+    if (hist_index == 6 || hist_index == 9 || hist_index == 10 || hist_index == 13) {
+      yMin = 1;
+      yMax = 8;
+      yMinFiller = yMax + 1;
+      yMaxFiller = 14;
+    } else if (hist_index == 8 || hist_index == 11) {
+      yMin = 9;
+      yMax = 14;
+      yMinFiller = 1;
+      yMaxFiller = yMin - 1; 
+    } else {
+      yMin = 1;
+      yMax = 10;
+      yMinFiller = yMax + 1;
+      yMaxFiller = 14;
+    }
+
+    double meanChamberStrip; double sumChamberStrip = 0;
+    double meanChamberStripHot; double sumChamberStripHot = 0;
+    double meanChamberStripDead; double sumChamberStripDead = 0;
+    double minValue = emtfChamberStrip_QT[hist_index]->getTH1()->GetMinimum(); 
+    double maxValue = emtfChamberStrip_QT[hist_index]->getTH1()->GetMaximum();
 
     for (int binX=1; binX <= xMax; binX++) {
-      for (int binY=1; binY <= yMax; binY++) {
-	emtfChamberStrip_QT_dead[hist_index]->getTH1()->SetBinContent(binX, binY, 1 + sqrt((meanChamberStrip-minValue)/(maxValue - minValue)) - sqrt((emtfChamberStrip_QT[hist_index]->getTH1()->GetBinContent(binX, binY) - minValue)/(maxValue - minValue)));
-	emtfChamberStrip_QT_hot[hist_index]->getTH1()->SetBinContent(binX, binY, 1 - sqrt((meanChamberStrip - minValue)/(maxValue - minValue)) + sqrt((emtfChamberStrip_QT[hist_index]->getTH1()->GetBinContent(binX, binY)-minValue)/(maxValue - minValue)));
+      for (int binY = yMin; binY <= yMax; binY++) {
+        sumChamberStrip += sqrt(emtfChamberStrip_QT[hist_index]->getTH1()->GetBinContent(binX, binY));
+
+//        sumChamberStrip += sqrt((emtfChamberStrip_QT[hist_index]->getTH1()->GetBinContent(binX, binY) - minValue)/(maxValue - minValue));
       }
     }
+    meanChamberStrip = sumChamberStrip/(xMax*(yMax-yMin+1));
+
+    for (int binX=1; binX <= xMax; binX++) {
+      for (int binY = yMin; binY <= yMax; binY++) {
+	emtfChamberStrip_QT_dead[hist_index]->getTH1()->SetBinContent(binX, binY, 1 + meanChamberStrip - sqrt(emtfChamberStrip_QT[hist_index]->getTH1()->GetBinContent(binX, binY)));
+	emtfChamberStrip_QT_hot[hist_index]->getTH1()->SetBinContent(binX, binY, 1 - meanChamberStrip + sqrt(emtfChamberStrip_QT[hist_index]->getTH1()->GetBinContent(binX, binY))); 
+
+//	emtfChamberStrip_QT_dead[hist_index]->getTH1()->SetBinContent(binX, binY, 1 + meanChamberStrip - sqrt((emtfChamberStrip_QT[hist_index]->getTH1()->GetBinContent(binX, binY) - minValue)/(maxValue - minValue)));
+//	emtfChamberStrip_QT_hot[hist_index]->getTH1()->SetBinContent(binX, binY, 1 - meanChamberStrip + sqrt((emtfChamberStrip_QT[hist_index]->getTH1()->GetBinContent(binX, binY) - minValue)/(maxValue - minValue))); 
+      }
+    }
+
+    for (int binX=1; binX <= xMax; binX++) {
+      for (int binY = yMin; binY <= yMax; binY++) {
+        sumChamberStripHot += emtfChamberStrip_QT_hot[hist_index]->getTH1()->GetBinContent(binX, binY);
+        sumChamberStripDead += emtfChamberStrip_QT_dead[hist_index]->getTH1()->GetBinContent(binX, binY);
+      }
+    }
+    meanChamberStripHot = sumChamberStripHot/(xMax*(yMax-yMin+1));
+    meanChamberStripDead = sumChamberStripDead/(xMax*(yMax-yMin+1));
+
+  //fill all histograms so they maintain their error percentage, but all have 504 bins, 1 error = .198
+  if (yMin > 1 || yMax < 14) {
+    for (int binX = 1; binX <= 36; binX++) {
+      for (int binY = yMinFiller; binY <= yMaxFiller; binY++) {
+	emtfChamberStrip_QT_dead[hist_index]->getTH1()->SetBinContent(binX, binY, meanChamberStripDead);
+	emtfChamberStrip_QT_hot[hist_index]->getTH1()->SetBinContent(binX, binY, meanChamberStripHot);
+      }
+    }
+  }
+  if (xMax < 36) {
+    for (int binX = xMinFiller; binX <= 36; binX++) {
+      for (int binY = 1; binY <= 14; binY++) {
+	emtfChamberStrip_QT_dead[hist_index]->getTH1()->SetBinContent(binX, binY, meanChamberStripDead);
+	emtfChamberStrip_QT_hot[hist_index]->getTH1()->SetBinContent(binX, binY, meanChamberStripHot);
+      }
+    }
+  }
+}
 //_____________________________________________________________________________________________________________
 
     if (Hit->Subsector() == 1) {

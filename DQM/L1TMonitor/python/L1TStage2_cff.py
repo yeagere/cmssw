@@ -1,5 +1,8 @@
 import FWCore.ParameterSet.Config as cms
 
+# DQM quality tests added by Emma
+from DQM.L1TMonitorClient.L1TStage2QualityTests_cff import * #added by Emma, see below for sequence
+
 #-------------------------------------------------
 # Stage2 Unpacker Modules
 # TODO: This needs to be setup as a StandardSequence.
@@ -16,7 +19,7 @@ from EventFilter.L1TRawToDigi.bmtfDigis_cfi import *
 # OMTF
 #from EventFilter.L1TRawToDigi.omtfStage2Digis_cfi import *
 
-# EMTF
+# EMTF 
 from EventFilter.L1TRawToDigi.emtfStage2Digis_cfi import *
 
 # uGMT
@@ -59,6 +62,9 @@ from DQM.L1TMonitor.L1TStage2BMTF_cfi import *
 # EMTF
 from DQM.L1TMonitor.L1TStage2EMTF_cfi import *
 
+# EMTFqt
+from DQM.L1TMonitor.L1TStage2EMTFqt_cfi import * #added by Emma
+
 # uGMT
 from DQM.L1TMonitor.L1TStage2uGMT_cfi import *
 
@@ -74,7 +80,16 @@ l1tStage2OnlineDQM = cms.Sequence(
     l1tStage2Bmtf +
     #l1tStage2Omtf +
     l1tStage2Emtf +
+    #l1tStage2Emtfqt + #added by Emma
     l1tStage2uGMT +
     l1tStage2uGt
 )
+
+
+l1tStage2MonitorClient = cms.Sequence(
+    l1TStage2QualityTests + #added by Emma
+    l1tStage2OnlineDQM #added by Emma
+)
+
+
 

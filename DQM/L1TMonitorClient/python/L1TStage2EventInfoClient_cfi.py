@@ -130,14 +130,8 @@ l1tStage2EventInfoClient = cms.EDAnalyzer("L1TEventInfoClient",
                         SystemDisable  = cms.uint32(0),
                         QualityTests = cms.VPSet(
                             cms.PSet(
-                                QualityTestName = cms.string("NoisyChannel_Chamber_Hot"),
-                                QualityTestHist = cms.string("L1T2016/L1TStage2EMTF/emtfChamberStrip_QT_hot*"),
-                                QualityTestSummaryEnabled = cms.uint32(1)
-                                ),
-
-                            cms.PSet(
-                                QualityTestName = cms.string("NoisyChannel_Chamber_Dead"),
-                                QualityTestHist = cms.string("L1T2016/L1TStage2EMTF/emtfChamberStrip_QT_dead*"),
+                                QualityTestName = cms.string("NoisyChannel_Chamber"),
+                                QualityTestHist = cms.string("L1T2016/L1TStage2EMTF/emtfChamberStrip_QT*"),
                                 QualityTestSummaryEnabled = cms.uint32(1)
                                 ),
 
@@ -149,13 +143,13 @@ l1tStage2EventInfoClient = cms.EDAnalyzer("L1TEventInfoClient",
 
                             cms.PSet(
                                 QualityTestName = cms.string("NoisyChannel_TrackBX"),
-                                QualityTestHist = cms.string("L1T2016/L1TStage2EMTF/emtfTrackBX*"),
+                                QualityTestHist = cms.string("L1T2016/L1TStage2EMTF/emtfTrackBX_QT*"),
                                 QualityTestSummaryEnabled = cms.uint32(1)
                                 ),
 
                             cms.PSet(                                
 				QualityTestName = cms.string("NoisyChannel_TrackPhi"),
-                                QualityTestHist = cms.string("L1T2016/L1TStage2EMTF/emtfTrackPhi*"),
+                                QualityTestHist = cms.string("L1T2016/L1TStage2EMTF/emtfTrackPhi_QT*"),
                                 QualityTestSummaryEnabled = cms.uint32(1)
                                 ) 
                             )
