@@ -62,9 +62,6 @@ from DQM.L1TMonitor.L1TStage2BMTF_cfi import *
 # EMTF
 from DQM.L1TMonitor.L1TStage2EMTF_cfi import *
 
-# EMTFqt
-from DQM.L1TMonitor.L1TStage2EMTFqt_cfi import * #added by Emma
-
 # uGMT
 from DQM.L1TMonitor.L1TStage2uGMT_cfi import *
 
@@ -80,7 +77,6 @@ l1tStage2OnlineDQM = cms.Sequence(
     l1tStage2Bmtf +
     #l1tStage2Omtf +
     l1tStage2Emtf +
-    #l1tStage2Emtfqt + #added by Emma
     l1tStage2uGMT +
     l1tStage2uGt
 )
