@@ -613,6 +613,7 @@ DQMStore::initializeFrom(const edm::ParameterSet& pset) {
   initQCriterion<Comp2RefEqualH>(qalgos_);
   initQCriterion<DeadChannel>(qalgos_);
   initQCriterion<NoisyChannel>(qalgos_);
+  initQCriterion<ContentSigma>(qalgos_); //added by Emma
   initQCriterion<ContentsWithinExpected>(qalgos_);
   initQCriterion<CompareToMedian>(qalgos_);
   initQCriterion<CompareLastFilledBin>(qalgos_);
@@ -3320,12 +3321,14 @@ DQMStore::useQTest(const std::string &dir, const std::string &qtname)
 
   // Redirect to the pattern match version.
   useQTestByMatch(*cleaned + "/*", qtname);
+
 }
 
 /// attach quality test <qc> to monitor elements matching <pattern>.
 int
 DQMStore::useQTestByMatch(const std::string &pattern, const std::string &qtname)
 {
+  std::cout<<"Pattern: "<<pattern<<"\n";
   QCriterion *qc = getQCriterion(qtname);
   if (! qc)
     raiseDQMError("DQMStore", "Cannot apply non-existent quality test '%s'",

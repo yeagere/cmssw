@@ -64,6 +64,19 @@ class DQMQualityTest
     // set # of neighboring channels for calculating average (default: 1)
     noisyChan_test_->setNumNeighbors(2);
 
+//==================== ContentSigma (added by Emma)=========================//
+    contentSigma_test_ = new ContentSigma("contentSigma");
+    // set tolerance for content sigma
+    contentSigma_test_->setToleranceNoisy(1);
+    contentSigma_test_->setToleranceDead(1);
+    // set # of neighboring channels for calculating average (default: 1)
+    contentSigma_test_->setNumNeighborsX(10);
+    contentSigma_test_->setNumNeighborsY(10);
+    // declare whether to test for noisy or dead bins
+    contentSigma_test_->setNoisy(1);
+    contentSigma_test_->setDead(1);
+//==========================================================================//
+
     // Mean-within-expected-value test
     meanNear_test_ = new MeanWithinExpected("meanNear");
     // set expected mean value
@@ -205,6 +218,7 @@ class DQMQualityTest
   ContentsYRange * yrange_test_;  // contents within y-range test
   DeadChannel * deadChan_test_;  // check for dead channels
   NoisyChannel * noisyChan_test_;  // check for noisy channels
+  ContentSigma * contentSigma_test_;  // compare channels using sigma added by Emma
   Comp2RefEqualH * equalH_test_; // equality test for histograms
   //Comp2RefEqualInt * equalInt_test_; // equality test for integers
   MeanWithinExpected * meanNear_test_; // mean-within-expected test

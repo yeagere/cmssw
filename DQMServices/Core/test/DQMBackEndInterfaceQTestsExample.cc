@@ -77,6 +77,7 @@ private:
   ContentsYRange * yrange_test;  // contents within y-range test
   DeadChannel * deadChan_test;  // check against dead channels
   NoisyChannel * noisyChan_test;  // check against noisy channels
+  ContentSigma * contentSigma_test;  // compare using sigma added by Emma
   Comp2RefEqualH * equalH_test; // equality test for histograms
   MeanWithinExpected * meanNear_test; // mean-within-expected test
   // MostProbableLandau *poMPLandau_test_;
@@ -146,6 +147,9 @@ DQMStoreQTestsExample::DQMStoreQTestsExample(const edm::ParameterSet& iConfig ) 
   yrange_test = new ContentsYRange("my_yrange");
   deadChan_test = new DeadChannel("deadChan");
   noisyChan_test = new NoisyChannel("noisyChan");
+//==================== ContentSigma (added by Emma)=========================//
+  contentSigma_test = new ContentSigma("contentSigma");
+//==========================================================================//
   equalH_test = new Comp2RefEqualH("my_histo_equal");
   meanNear_test = new MeanWithinExpected("meanNear");
   //zrangeh2f_test = new ContentsTH2FWithinRange("zrangeh2f");
@@ -166,6 +170,17 @@ DQMStoreQTestsExample::DQMStoreQTestsExample(const edm::ParameterSet& iConfig ) 
   // set # of neighboring channels for calculating average (default: 1)
   noisyChan_test->setNumNeighbors(2);
   // use RMS of distribution to judge if mean near expected value
+//==================== ContentSigma (added by Emma)=========================//
+    // set tolerance for content sigma
+    contentSigma_test->setToleranceNoisy(1);
+    contentSigma_test->setToleranceDead(1);
+    // set # of neighboring channels for calculating average (default: 1)
+    contentSigma_test->setNumNeighborsX(10);
+    contentSigma_test->setNumNeighborsY(10);
+    // declare whether to test for noisy or dead bins
+    contentSigma_test->setNoisy(1);
+    contentSigma_test->setDead(1);
+//==========================================================================//
   meanNear_test->useRMS();
   // Setup MostProbableLandau
   //poMPLandau_test_->setXMin( 0.1 * XMIN);

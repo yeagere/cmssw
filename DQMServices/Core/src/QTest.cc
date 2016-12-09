@@ -895,25 +895,206 @@ double NoisyChannel::getAverage2D(int binX, int binY, int nbinsX, int nbinsY, co
 {
   /// do NOT use underflow bin
   int first = 1;
-  /// do NOT use overflow bin
-  int ncx  = h->GetXaxis()->GetNbins();
-  int ncy  = h->GetYaxis()->GetNbins();
   double sum = 0;
   int bin_lowX, bin_hiX, bin_lowY, bin_hiY;
-  unsigned neighborsX = nbinsX;
-  unsigned neighborsY = nbinsY;
+  int neighborsX, neighborsY;
+  if (nbinsX%2 == 0) {
+    neighborsX = nbinsX/2 - 1; //set neighbors for no overlap
+  }
+  else { neighborsX = (nbinsX - 1)/2; } //set neighbors for no overlap
+  if (nbinsY%2 == 0) {
+    neighborsY = nbinsY/2 - 1; 
+  }
+  else { neighborsY = (nbinsY - 1)/2; }
 
-  for (unsigned j = 1; j <= neighborsY; ++j) {
-    for (unsigned i = 1; i <= neighborsX; ++i) {
+  for (int i = 1; i <= neighborsX; ++i) { //scan entire chamber
+    for (int j = 1; j <= neighborsY; ++j) { 
+
       /// use symmetric-to-bin bins to calculate average
-      bin_lowY = binY-j;  bin_hiY = binY+j;
+      bin_lowX = binX-i;  bin_hiX = binX+i;
       /// check if need to consider bins on other side of spectrum
       /// (ie. if bins below 1 or above ncx)
-      while (bin_lowY < first) // shift bin by +ncy
-	bin_lowY = ncy + bin_lowY;
-      while (bin_hiY > ncy) // shift bin by -ncy
-       	bin_hiY = bin_hiY - ncy;
+      while (bin_lowX < first) // shift bin by +nbinsX
+        bin_lowX = nbinsX + bin_lowX;
+      while (bin_hiX > nbinsX) // shift bin by -nbinsX
+        bin_hiX = bin_hiX - nbinsX;
 
+      bin_lowY = binY-j;  bin_hiY = binY+j;
+      while (bin_lowY < first) // shift bin by +nbinsY
+	bin_lowY = nbinsY + bin_lowY;
+      while (bin_hiY > nbinsY) // shift bin by -nbinsY
+       	bin_hiY = bin_hiY - nbinsY;
+
+      sum += h -> GetBinContent(bin_lowX, bin_lowY) + //sum each corner section
+	     h -> GetBinContent(bin_lowX, bin_hiY) + 
+	     h -> GetBinContent(bin_hiX, bin_lowY) +
+     	     h -> GetBinContent(bin_hiX, bin_hiY);     
+    } 
+  } 
+  for (int i = 1; i <= neighborsX; ++i) { //scan cross section X
+      bin_lowX = binX-i;  bin_hiX = binX+i;
+      while (bin_lowX < first) // shift bin by +ncx
+        bin_lowX = nbinsX + bin_lowX;
+      while (bin_hiX > nbinsX) // shift bin by -ncx
+        bin_hiX = bin_hiX - nbinsX;
+      sum += h -> GetBinContent(bin_lowX, binY) + //sum left and right center x sections
+	     h -> GetBinContent(bin_hiX, binY);     
+  } 
+  for (int i = 1; i <= neighborsY; ++i) { //scan cross section Y 
+      bin_lowY = binY-i;  bin_hiY = binY+i;
+      while (bin_lowY < first) // shift bin by +ncy
+	bin_lowY = nbinsY + bin_lowY;
+      while (bin_hiY > nbinsY) // shift bin by -ncy
+       	bin_hiY = bin_hiY - nbinsY;
+      sum += h -> GetBinContent(binX, bin_lowY) + //sum upper and lower center y sections
+	     h -> GetBinContent(binX, bin_hiY);     
+  } 
+  /// average is sum over the # of bins used
+  return sum/((2*neighborsX + 1)*(2*neighborsY + 1) - 1);
+
+}
+
+//-----------------------------------------------------//
+//---------  Content Sigma (added by Emma) ------------//
+//----------------------------------------------------//
+// run the test (result: fraction of channels with sigma that is not noisy or hot)
+
+float ContentSigma::runTest(const MonitorElement *me)
+{
+  badChannels_.clear();
+  if (!me) 
+    return -1;
+  if (!me->getRootObject()) 
+    return -1; 
+  TH1* h=0;//initialize histogram pointer
+
+  if (verbose_>1) 
+    std::cout << "QTest:" << getAlgoName() << "::runTest called on " 
+              << me-> getFullname() << "\n";
+
+  int nbinsX;
+  int nbinsY;
+
+  //-- TH1F
+  if (me->kind()==MonitorElement::DQM_KIND_TH1F)
+  { 
+    nbinsX = me->getTH2F()->GetXaxis()->GetNbins(); 
+    nbinsY = me->getTH2F()->GetYaxis()->GetNbins(); 
+    h  = me->getTH1F(); // access Test histo
+  } 
+  //-- TH1S
+  else if (me->kind()==MonitorElement::DQM_KIND_TH1S)
+  { 
+    nbinsX = me->getTH2F()->GetXaxis()->GetNbins(); 
+    nbinsY = me->getTH2F()->GetYaxis()->GetNbins(); 
+    h  = me->getTH1S(); // access Test histo
+  } 
+  //-- TH1D
+  else if (me->kind()==MonitorElement::DQM_KIND_TH1D)
+  { 
+    nbinsX = me->getTH2F()->GetXaxis()->GetNbins(); 
+    nbinsY = me->getTH2F()->GetYaxis()->GetNbins(); 
+    h  = me->getTH1D(); // access Test histo
+  } 
+  //-- TH2
+  else if (me->kind()==MonitorElement::DQM_KIND_TH2F)
+  { 
+    nbinsX = me->getTH2F()->GetXaxis()->GetNbins(); 
+    nbinsY = me->getTH2F()->GetYaxis()->GetNbins(); 
+    h  = me->getTH2F(); // access Test histo
+  } 
+  //-- TH2
+  else if (me->kind()==MonitorElement::DQM_KIND_TH2S)
+  { 
+    nbinsX = me->getTH2F()->GetXaxis()->GetNbins(); 
+    nbinsY = me->getTH2F()->GetYaxis()->GetNbins(); 
+    h  = me->getTH2S(); // access Test histo
+  } 
+  //-- TH2
+  else if (me->kind()==MonitorElement::DQM_KIND_TH2D)
+  { 
+    nbinsX = me->getTH2F()->GetXaxis()->GetNbins(); 
+    nbinsY = me->getTH2F()->GetYaxis()->GetNbins(); 
+    h  = me->getTH2D(); // access Test histo
+  } 
+  else 
+  {  
+    if (verbose_>0) 
+      std::cout << "QTest:ContentSigma"
+        << " ME " << me->getFullname() 
+        << " does not contain TH1F/TH1S/TH1D or TH2F/TH2S/TH2D, exiting\n"; 
+    return -1;
+  }
+
+  //--  QUALITY TEST itself 
+
+  if ( !rangeInitialized_ || !h->GetXaxis() ) 
+    return 1; // all channels are accepted if tolerance has not been set
+
+  // do NOT use underflow bin
+  int first = 1;
+  // initialize bin failure count
+  int fail = 0;
+  int neighborsX = numNeighborsX_; 
+  int neighborsY = numNeighborsY_;
+  if (neighborsX*2 >= nbinsX) {//make sure neighbor check does not overlap with bin under consideration
+    if (nbinsX%2 == 0) {
+      neighborsX = nbinsX/2 - 1; //set neighbors for no overlap
+    }
+    else { neighborsX = (nbinsX - 1)/2; } //set neighbors for no overlap
+  }
+  if (neighborsY*2 >= nbinsY) {
+    if (nbinsY%2 == 0) {
+      neighborsY = nbinsY/2 - 1; 
+    }
+    else { neighborsY = (nbinsY - 1)/2; }
+  }
+
+  for (int binY = first; binY <= nbinsY; ++binY) { //for all histogram exempting overflow bins
+    for (int binX = first; binX <= nbinsX; ++binX) {
+      double content = h->GetBinContent(binX, binY);
+      double sum = getNeighborSum(binX, binY, neighborsX, neighborsY, h);
+      double average = sum/((2*neighborsX + 1)*(2*neighborsY + 1) - 1);
+      double sigma = sqrt(average*sqrt(sum)/sum + content);
+      std::cout<<"Sum: "<<sum<<"  Average: "<<average<<"  Sigma: "<<sigma<<"\n";
+      bool failureNoisy = false;
+      bool failureDead = false;
+      if (average != 0)
+	 if (noisy_ && dead_) {
+           failureNoisy = ((content - sigma*toleranceNoisy_) > average);
+           failureDead = ((content - sigma*toleranceDead_) < average);
+	 }
+	 else if (dead_) {
+           failureDead = ((content - sigma*toleranceDead_) < average);
+	 }
+	 else if (noisy_) {
+           failureNoisy = ((content - sigma*toleranceNoisy_) > average);
+	 }
+      if (failureNoisy || failureDead)
+      {
+        ++fail;
+        DQMChannel chan(binX, 0, 0, content, h->GetBinError(binX));
+        badChannels_.push_back(chan);
+      }
+    }
+  }
+    // return fraction of bins that passed test
+    return 1.*((nbinsX * nbinsY) - fail)/(nbinsX * nbinsY);
+}
+
+// get average for bin under consideration
+double ContentSigma::getNeighborSum(int binX, int binY, int neighborsX, int neighborsY, const TH1 *h) const
+{
+  /// do NOT use underflow bin
+  int first = 1;
+  double sum = 0;
+  int ncx = h->GetXaxis()->GetNbins();
+  int ncy = h->GetYaxis()->GetNbins();
+  int bin_lowX, bin_hiX, bin_lowY, bin_hiY;
+
+  for (int i = 0; i <= neighborsX; ++i) { //scan entire chamber
+    for (int j = 0; j <= neighborsY; ++j) { 
+			if (i == 0 && j == 0) continue;	
       /// use symmetric-to-bin bins to calculate average
       bin_lowX = binX-i;  bin_hiX = binX+i;
       /// check if need to consider bins on other side of spectrum
@@ -923,11 +1104,28 @@ double NoisyChannel::getAverage2D(int binX, int binY, int nbinsX, int nbinsY, co
       while (bin_hiX > ncx) // shift bin by -ncx
         bin_hiX = bin_hiX - ncx;
 
-      sum += h->GetBinContent(bin_lowX, bin_lowY) + h->GetBinContent(bin_hiX, bin_hiY); 
-    }
+      bin_lowY = binY-j;  bin_hiY = binY+j;
+      while (bin_lowY < first) // shift bin by +ncy
+				bin_lowY = ncy + bin_lowY;
+      while (bin_hiY > ncy) // shift bin by -ncy
+       	bin_hiY = bin_hiY - ncy;
+			if (i == 0) {
+      	sum += h -> GetBinContent(binX, bin_lowY) + //sum upper and lower centered y sections
+	     	h -> GetBinContent(binX, bin_hiY);
+			}
+			else if (j == 0) {
+      	sum += h -> GetBinContent(bin_lowX, binY) + //sum left and right centered x sections
+	      h -> GetBinContent(bin_hiX, binY);
+			}
+			else {
+      	sum += h -> GetBinContent(bin_lowX, bin_lowY) + //sum each corner section
+	      h -> GetBinContent(bin_lowX, bin_hiY) + 
+	      h -> GetBinContent(bin_hiX, bin_lowY) +
+     	  h -> GetBinContent(bin_hiX, bin_hiY);     
+    	} 
+		}
   } 
-  /// average is sum over the # of bins used
-  return (sum)/((neighborsX * neighborsY) * 2);
+  return sum;
 }
 
 //-----------------------------------------------------------//

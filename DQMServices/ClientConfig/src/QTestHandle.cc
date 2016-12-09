@@ -72,9 +72,10 @@ void QTestHandle::attachTests(DQMStore *bei, bool verboseQT)
   {
     const std::string &meName = itr->first;
     const std::vector<std::string> &tests = itr->second;
-    
     for (std::vector<std::string>::const_iterator testsItr = tests.begin();
 	 testsItr != tests.end(); ++testsItr){
+            std::cout<<"meName: "<<meName<<"  testsItr:  "<<*testsItr<<"\n";
+
       int cases =  bei->useQTestByMatch(meName, *testsItr);
       if (firstTime && verboseQT && cases == 0)
        edm::LogWarning ("QTestHandle::attachTests")

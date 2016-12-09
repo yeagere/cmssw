@@ -44,6 +44,8 @@ bool QTestConfigure::enableTests(
       this->EnableDeadChannelTest(testName, params,bei);
     if(!std::strcmp(testType.c_str(),NoisyChannel::getAlgoName().c_str()))
       this->EnableNoisyChannelTest(testName, params,bei);
+    if(!std::strcmp(testType.c_str(),ContentSigma::getAlgoName().c_str()))
+      this->EnableContentSigmaTest(testName, params,bei); //added by Emma
     if(!std::strcmp(testType.c_str(),MeanWithinExpected::getAlgoName().c_str()))
       this->EnableMeanWithinExpectedTest(testName, params,bei);
     if(!std::strcmp(testType.c_str(),Comp2RefEqualH::getAlgoName().c_str()))
@@ -197,6 +199,38 @@ void QTestConfigure::EnableNoisyChannelTest(std::string testName,
   me_qc1->setWarningProb(warning);
   me_qc1->setErrorProb(error);
 }
+
+//==================== ContentSigma (added by Emma)=========================//
+void QTestConfigure::EnableContentSigmaTest(std::string testName,
+                                            const std::map<std::string, std::string> & params,
+                                            DQMStore *bei) {
+  QCriterion * qc1;
+  if (! bei->getQCriterion(testName)) {
+    testsConfigured.push_back(testName);
+    qc1 = bei->createQTest(ContentSigma::getAlgoName(), testName);
+  } else {
+    qc1 = bei->getQCriterion(testName);
+  }
+  ContentSigma * me_qc1  = (ContentSigma *) qc1;
+  unsigned int neighborsX = (unsigned int) atof(findOrDefault(params, "neighboursX", "0"));
+  unsigned int neighborsY = (unsigned int) atof(findOrDefault(params, "neighboursY", "0"));
+  double toleranceNoisy = atof(findOrDefault(params, "toleranceNoisy", "0"));
+  double toleranceDead = atof(findOrDefault(params, "toleranceDead", "0"));
+  int noisy = atoi(findOrDefault(params, "noisy", "0"));
+  int dead = atoi(findOrDefault(params, "dead", "0"));
+  double warning = atof(findOrDefault(params, "warning", "0"));
+  double error = atof(findOrDefault(params, "error", "0"));
+  me_qc1->setNumNeighborsX (neighborsX);
+  me_qc1->setNumNeighborsY (neighborsY);
+  me_qc1->setToleranceNoisy (toleranceNoisy);
+  me_qc1->setToleranceDead (toleranceDead);
+  me_qc1->setNoisy (noisy);
+  me_qc1->setDead (dead);
+  me_qc1->setWarningProb(warning);
+  me_qc1->setErrorProb(error);
+}
+
+//==========================================================================//
 
 void QTestConfigure::EnableMeanWithinExpectedTest(std::string testName,
                                                   const std::map<std::string, std::string> & params,
