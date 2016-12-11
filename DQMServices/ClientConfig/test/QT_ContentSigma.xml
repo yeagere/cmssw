@@ -1,0 +1,20 @@
+<TESTSCONFIGURATION>
+
+<QTEST name="exampleQTest">
+	<TYPE>NoisyChannel</TYPE>	
+	<PARAM name="toleranceNoisy">0.2</PARAM>
+	<PARAM name="toleranceDead">0.2</PARAM>
+	<PARAM name="neighboursX">2</PARAM>
+	<PARAM name="neighboursY">2</PARAM>
+	<PARAM name="noisy">2</PARAM>
+	<PARAM name="dead">2</PARAM>
+	<PARAM name="error">0.30</PARAM>
+	<PARAM name="warning">0.70</PARAM>
+</QTEST>
+
+<!-- <LINK name="*clientHisto*"> -->
+<LINK name="*myHisto1*">
+	<TestName activate="true">exampleQTest</TestName>
+</LINK>
+
+</TESTSCONFIGURATION>
