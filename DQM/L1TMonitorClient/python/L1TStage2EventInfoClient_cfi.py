@@ -124,7 +124,7 @@ l1tStage2EventInfoClient = cms.EDAnalyzer("L1TEventInfoClient",
                                 ),
                             )
                         ),
-                    cms.PSet(
+                   cms.PSet(
                         SystemLabel = cms.string("EMTF"),
                         HwValLabel = cms.string("Stage2EMTF"),
                         SystemDisable  = cms.uint32(0),
@@ -135,11 +135,11 @@ l1tStage2EventInfoClient = cms.EDAnalyzer("L1TEventInfoClient",
                                 QualityTestSummaryEnabled = cms.uint32(1)
                                 ),
 
-                            cms.PSet(
-                                QualityTestName = cms.string("XRange_Errors"),
-                                QualityTestHist = cms.string("L1T2016/L1TStage2EMTF/emtfErrors"),
-                                QualityTestSummaryEnabled = cms.uint32(1)
-                                ),
+#                            cms.PSet(
+#                                QualityTestName = cms.string("XRange_Errors"),
+#                                QualityTestHist = cms.string("L1T2016/L1TStage2EMTF/emtfErrors"),
+#                                QualityTestSummaryEnabled = cms.uint32(1)
+#                                ),
 
                             cms.PSet(
                                 QualityTestName = cms.string("NoisyChannel_TrackBX"),

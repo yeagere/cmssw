@@ -90,15 +90,6 @@ process.l1tStage2OnlineDQM.remove(process.l1tStage2uGt) #added by Emma
 process.load("DQM.L1TMonitorClient.L1TStage2MonitorClient_cff")
 process.l1tStage2MonitorClientPath = cms.Path(process.l1tStage2MonitorClient)
 
-#added by Emma
-process.qTester = cms.EDAnalyzer("QualityTester",
-#process.qTester = cms.EDAnalyzer("L1TStage2EMTF",
-    qtList = cms.untracked.FileInPath('DQM/L1TMonitorClient/data/L1TStage2EMTFQualityTests.xml'),
-    prescaleFactor = cms.untracked.int32(1),                               
-    testInEventloop = cms.untracked.bool(False),
-    verboseQT =  cms.untracked.bool(True)                 
-)
-
 #--------------------------------------------------
 # Legacy DQM EndPath
 # TODO: Is lumi scalers still relevant?
