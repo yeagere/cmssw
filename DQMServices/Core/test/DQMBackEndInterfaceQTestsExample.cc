@@ -212,6 +212,7 @@ DQMStoreQTestsExample::~DQMStoreQTestsExample()
   if(yrange_test)delete yrange_test;
   if(deadChan_test)delete deadChan_test;
   if(noisyChan_test)delete noisyChan_test;
+  if(contentSigma_test)delete contentSigma_test; //added by Emma
   if(equalH_test) delete equalH_test;
   if(meanNear_test)delete meanNear_test;
 //  if(zrangeh2f_test) delete zrangeh2f_test;
@@ -249,6 +250,7 @@ void DQMStoreQTestsExample::endJob(void)
   yrange_test->setMinimumEntries(10000);
   deadChan_test->setMinimumEntries(10000);
   noisyChan_test->setMinimumEntries(10000);
+  contentSigma_test->setMinimumEntries(10000); //added by Emma
   equalH_test->setMinimumEntries(10000);
   meanNear_test->setMinimumEntries(10000);
   //zrangeh2f_test->setMinimumEntries(10000);
@@ -266,6 +268,7 @@ void DQMStoreQTestsExample::endJob(void)
   yrange_test->setMinimumEntries(0);
   deadChan_test->setMinimumEntries(0);
   noisyChan_test->setMinimumEntries(0);
+  contentSigma_test->setMinimumEntries(0); //added by Emma
   equalH_test->setMinimumEntries(0);
   meanNear_test->setMinimumEntries(0);
   //zrangeh2f_test->setMinimumEntries(0);
@@ -305,6 +308,10 @@ void DQMStoreQTestsExample::runTests(int expected_status,
   noisyChan_test->runTest(h1);
   checkTest(noisyChan_test);
   showBadChannels(noisyChan_test);
+
+  contentSigma_test->runTest(h1); //added by Emma
+  checkTest(contentSigma_test); //added by Emma
+  showBadChannels(contentSigma_test); //added by Emma
 
   meanNear_test->runTest(h1);
   checkTest(meanNear_test);
@@ -369,6 +376,14 @@ void DQMStoreQTestsExample::runTests(int expected_status,
       && expected_status != status)
     cout << "ERROR: NoisyChannel test expected status " << expected_status
 	 << ", got " << status << endl;
+
+  status = contentSigma_test->getStatus(); //added by Emma
+  // there is no "INVALID" result when running "content sigma" test
+  if (expected_status //added by Emma
+      && expected_status != dqm::qstatus::INVALID //added by Emma
+      && expected_status != status) //added by Emma
+    cout << "ERROR: ContentSigma test expected status " << expected_status //added by Emma
+	 << ", got " << status << endl; //added by Emma
 
   status = meanNear_test->getStatus();
   if (expected_status && expected_status != status)

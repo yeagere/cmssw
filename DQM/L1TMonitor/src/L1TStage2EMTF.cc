@@ -128,7 +128,7 @@ void L1TStage2EMTF::bookHistograms(DQMStore::IBooker& ibooker, const edm::Run&, 
 
 //________________QUALITY TESTER (added by Emma)__CHAMBER STRIP________________________________________________
 
-//  ibooker.setCurrentFolder(monitorDir + "/QualityTestCollection"); //book in subfolder
+  ibooker.setCurrentFolder(monitorDir + "/QualityTestCollection"); //book in subfolder
     emtfChamberStrip_QT[hist] = ibooker.book2D("emtfChamberStrip_QT" + name, "EMTF Halfstrip QT " + label, n_xbins, 1, 1+n_xbins, n_ybins, yMin, yMax);
     emtfChamberStrip_QT[hist]->setAxisTitle("Chamber, " + label, 1);
     emtfChamberStrip_QT[hist]->setAxisTitle("Cathode Halfstrip", 2);
@@ -146,7 +146,7 @@ void L1TStage2EMTF::bookHistograms(DQMStore::IBooker& ibooker, const edm::Run&, 
       emtfChamberStrip_QT_hot[hist]->setBinLabel(bin, std::to_string(bin), 1);
       emtfChamberStrip_QT_dead[hist]->setBinLabel(bin, std::to_string(bin), 1);
     } 
-//  ibooker.setCurrentFolder(monitorDir); //return to main folder
+  ibooker.setCurrentFolder(monitorDir); //return to main folder
 //_____________________________________________________________________________________________________________
 
   emtfHitOccupancy = ibooker.book2D("emtfHitOccupancy", "EMTF Chamber Occupancy", 54, 1, 55, 10, -5, 5);

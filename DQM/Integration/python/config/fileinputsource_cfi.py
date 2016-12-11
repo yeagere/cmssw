@@ -18,7 +18,7 @@ source = cms.Source(
 )
 
 maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32(500)
+    input = cms.untracked.int32(5000)
 )
 
 # Parameters for runType
