@@ -7,6 +7,8 @@
 #include <sstream>
 #include <math.h>
 
+#include "Math/ProbFuncMathCore.h" //added by Emma
+
 using namespace std;
 
 const float QCriterion::ERROR_PROB_THRESHOLD = 0.50;
@@ -848,7 +850,6 @@ float NoisyChannel::runTest(const MonitorElement *me)
       for (binX = first; binX <= lastX; ++binX) {
         double contents = h->GetBinContent(binX, binY);
         double average = getAverage2D(binX, binY, h);
-        //std::cout<<"2D average: "<<average<<"\n";
         bool failure = false;
         if (average != 0)
            failure = (((contents-average)/TMath::Abs(average)) > tolerance_);
@@ -1044,32 +1045,52 @@ float ContentSigma::runTest(const MonitorElement *me)
 
   for (int binY = first; binY <= nbinsY; ++binY) { //for all histogram exempting overflow bins
     for (int binX = first; binX <= nbinsX; ++binX) {
-      double content = h->GetBinContent(binX, binY);
+      unsigned int content = abs(h->GetBinContent(binX, binY));
       double sum = getNeighborSum(binX, binY, neighborsX, neighborsY, h);
       double average = sum/((2*neighborsX + 1)*(2*neighborsY + 1) - 1);
-      double sigma = sqrt(average*sqrt(sum)/sum + abs(content));
-			std::printf("Bin content: %f with sigma: %f and surrounding averge: %f\n", content, sigma, average);
-			std::printf("X neighbors: %i and Y neighbors: %i\n", neighborsX, neighborsY);
+      //double sigma = sqrt(average*sqrt(sum)/sum + abs(content));
+			double probNoisy = ROOT::Math::poisson_cdf_c(content, average);
+			double probDead = ROOT::Math::poisson_cdf(content, average);
+			double thresholdNoisy = ROOT::Math::normal_cdf_c(toleranceNoisy_);
+			double thresholdDead = ROOT::Math::normal_cdf(-1 * toleranceDead_);
+			//std::printf("Bin content: %f with sigma: %f and surrounding averge: %f\n", content, sigma, average);
+			//std::printf("X neighbors: %i and Y neighbors: %i\n", neighborsX, neighborsY);
       int failureNoisy = 0;
       int failureDead = 0;
       if (average != 0)
-	 if (noisy_ && dead_) {
-           failureNoisy = ((content - sigma*toleranceNoisy_) > average);
-           failureDead = ((content - sigma*toleranceDead_) < average);
-	 }
-	 else if (noisy_) {
-           failureNoisy = ((content - sigma*toleranceNoisy_) > average);
-	 }
-	 else if (dead_) {
-           failureDead = ((content - sigma*toleranceDead_) < average);
-	 }
-      if (failureNoisy || failureDead)
-      {
-        ++fail;
-	std::printf("Overall fail: %i with failureNoisy: %i and failureDead: %i\n", fail, failureNoisy, failureDead);
-        DQMChannel chan(binX, 0, 0, content, h->GetBinError(binX));
-        badChannels_.push_back(chan);
-      }
+	 			if (noisy_ && dead_) {
+//        	failureNoisy = ((content - sigma*toleranceNoisy_) > average);
+//        	failureDead = ((content - sigma*toleranceDead_) < average);
+					if (content > average) {
+	        	failureNoisy = probNoisy < thresholdNoisy;
+					}
+					else {
+	        	failureDead = probDead < thresholdDead;
+					}
+	 			}
+	 			else if (noisy_) {
+					if (content > average) {
+	        	failureNoisy = probNoisy < thresholdNoisy;
+					}
+	 			}
+	 			else if (dead_) {
+					if (content < average) {
+	        	failureDead = probDead < thresholdDead;
+					}	
+	 			}
+				else { std::cout<<"No test type selected!\n";  }
+      	if (failureNoisy || failureDead) {
+	        ++fail;
+					string histName = h->GetName();
+					if (histName == "emtfChamberStripMENeg11a") {
+						std::printf("  For content: %i we get average: %f\n", content, average);
+						std::printf("   NOISY:: Probability: %f and Threshold: %f\n", probNoisy, thresholdNoisy);
+						std::printf("   DEAD::  Probability: %f and Threshold: %f\n", probDead, thresholdDead);
+						std::printf("For bin: (%i,%i) we get failureNoisy: %i and failureDead: %i\n", binX, binY, failureNoisy, failureDead);
+					}
+        	DQMChannel chan(binX, 0, 0, content, h->GetBinError(binX));
+        	badChannels_.push_back(chan);
+      	}
     }
   }
     // return fraction of bins that passed test

@@ -1,63 +1,54 @@
 <TESTSCONFIGURATION>
 
-    <QTEST name="NoisyChannel_Chamber">
-	<TYPE>NoisyChannel</TYPE>	
-	<PARAM name="tolerance">.5</PARAM>
-	<PARAM name="neighbours">0</PARAM>
-	<PARAM name="error">0.50</PARAM>
-	<PARAM name="warning">0.70</PARAM>
-    </QTEST>
+		<QTEST name="XRange_Errors">
+				<TYPE>ContentsXRange</TYPE>	
+				<PARAM name="xmin">0</PARAM>
+				<PARAM name="xmax">0</PARAM>	
+				<PARAM name="error">1</PARAM>
+				<PARAM name="warning">1</PARAM>
+		</QTEST>
 
-    <QTEST name="ContentSigma">
-	<TYPE>ContentSigma</TYPE>	
-	<PARAM name="toleranceNoisy">.5</PARAM>
-	<PARAM name="toleranceDead">2</PARAM>
-	<PARAM name="neighboursX">100</PARAM>
-	<PARAM name="neighboursY">100</PARAM>
-	<PARAM name="noisy">1</PARAM>
-	<PARAM name="dead">1</PARAM>
-	<PARAM name="error">0.30</PARAM>
-	<PARAM name="warning">0.70</PARAM>
+    <QTEST name="ContentSigma_Noisy">
+			<TYPE>ContentSigma</TYPE>	
+			<PARAM name="toleranceNoisy">1</PARAM>
+			<PARAM name="toleranceDead">1</PARAM>
+			<PARAM name="neighboursX">10</PARAM>		
+			<PARAM name="neighboursY">10</PARAM>
+			<PARAM name="noisy">1</PARAM>
+			<PARAM name="dead">0</PARAM>
+			<PARAM name="error">0.30</PARAM>
+			<PARAM name="warning">0.70</PARAM>
     </QTEST> 
 
-    <QTEST name="XRange_Errors">
-	<TYPE>ContentsXRange</TYPE>	
-	<PARAM name="xmin">0</PARAM>
-	<PARAM name="xmax">0</PARAM>
-	<PARAM name="error">1</PARAM>
-	<PARAM name="warning">1</PARAM>
-    </QTEST>
-
-    <QTEST name="NoisyChannel_TrackBX">
-	<TYPE>NoisyChannel</TYPE>	
-	<PARAM name="tolerance">1</PARAM>
-	<PARAM name="neighbours">12</PARAM>
-	<PARAM name="error">0.50</PARAM>
-	<PARAM name="warning">0.70</PARAM>
-    </QTEST>
-
-    <QTEST name="NoisyChannel_TrackPhi">
-	<TYPE>NoisyChannel</TYPE>	
-	<PARAM name="tolerance">1</PARAM>
-	<PARAM name="neighbours">128</PARAM>
-	<PARAM name="error">0.50</PARAM>
-	<PARAM name="warning">0.70</PARAM>
-    </QTEST>
+    <QTEST name="ContentSigma_Dead">
+			<TYPE>ContentSigma</TYPE>	
+			<PARAM name="toleranceNoisy">1</PARAM>
+			<PARAM name="toleranceDead">1</PARAM>
+			<PARAM name="neighboursX">10</PARAM>
+			<PARAM name="neighboursY">10</PARAM>
+			<PARAM name="noisy">0</PARAM>
+			<PARAM name="dead">1</PARAM>
+			<PARAM name="error">0.30</PARAM>
+			<PARAM name="warning">0.70</PARAM>
+    </QTEST> 
 
     <LINK name="*emtfErrors">
 	<TestName activate="true">XRange_Errors</TestName>
     </LINK> 
 
     <LINK name="*emtfChamberStrip*">
-        <TestName activate="true">ContentSigma</TestName>
+        <TestName activate="true">ContentSigma_Noisy</TestName>
+        <TestName activate="true">ContentSigma_Dead</TestName>
     </LINK> 
 
     <LINK name="*emtfTrackBX*">
-        <TestName activate="true">ContentSigma</TestName>
+        <TestName activate="true">ContentSigma_Noisy</TestName>
+        <TestName activate="true">ContentSigma_Dead</TestName>
     </LINK> 
 
     <LINK name="*emtfTrackPhi*">
-        <TestName activate="true">ContentSigma</TestName>
+        <TestName activate="true">ContentSigma_Noisy</TestName>
+        <TestName activate="true">ContentSigma_Dead</TestName>
     </LINK> 
 
 </TESTSCONFIGURATION>
