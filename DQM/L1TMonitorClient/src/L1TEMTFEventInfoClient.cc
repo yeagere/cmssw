@@ -53,8 +53,14 @@ L1TEMTFEventInfoClient::L1TEMTFEventInfoClient(const edm::ParameterSet& parSet) 
             m_hitObjects(parSet.getParameter<std::vector<edm::ParameterSet> >("HitObjects")),
             m_disableTrackObjects(parSet.getParameter<std::vector<std::string> >("DisableTrackObjects")),
             m_disableHitObjects(parSet.getParameter<std::vector<std::string> >("DisableHitObjects")),
+            m_noisyStrip(parSet.getParameter<std::vector<edm::ParameterSet> >("NoisyStrip")),
+            m_deadStrip(parSet.getParameter<std::vector<edm::ParameterSet> >("DeadStrip")),
+            m_disableNoisyStrip(parSet.getParameter<std::vector<std::string> >("DisableNoisyStrip")),
+            m_disableDeadStrip(parSet.getParameter<std::vector<std::string> >("DisableDeadStrip")),
             m_nrTrackObjects(0),
             m_nrHitObjects(0),
+            m_nrNoisyStrip(0),
+            m_nrDeadStrip(0),
             m_totalNrQtSummaryEnabled(0) {
 
     initialize();
@@ -231,7 +237,154 @@ void L1TEMTFEventInfoClient::initialize() {
 
     }
 
-    m_summaryContent.reserve(m_nrTrackObjects + m_nrHitObjects);
+
+    // L1 Strip Noisy=========================================================================================
+
+    m_nrNoisyStrip = m_noisyStrip.size();
+
+    m_noisyLabel.reserve(m_nrNoisyStrip);
+    m_noisyDisable.reserve(m_nrNoisyStrip);
+
+    // on average 20 quality tests per system 
+    m_noisyQualityTestName.reserve(20*m_nrNoisyStrip);  // Not needed? - AWB 05.12.16
+    m_noisyQualityTestHist.reserve(20*m_nrNoisyStrip);  // Not needed? - AWB 05.12.16
+    m_noisyQtSummaryEnabled.reserve(20*m_nrNoisyStrip);  // Not needed? - AWB 05.12.16
+
+    int indexNois = 0;
+
+    for (std::vector<edm::ParameterSet>::const_iterator itNoisy =
+            m_noisyStrip.begin(); itNoisy != m_noisyStrip.end(); ++itNoisy) {
+
+        m_noisyLabel.push_back(itNoisy->getParameter<std::string>(
+                "NoisyLabel"));
+
+        m_noisyDisable.push_back(itNoisy->getParameter<unsigned int>(
+                "NoisyDisable"));
+        // check the additional disable flag from m_disableNoisyObjects
+        for (std::vector<std::string>::const_iterator itNois =
+                m_disableNoisyStrip.begin(); itNois != m_disableNoisyStrip.end(); ++itNois) {
+
+            if (*itNois == m_noisyLabel[indexNois]) {
+                m_noisyDisable[indexNois] = 1;
+            }
+        }
+
+        std::vector < edm::ParameterSet > qTests = itNoisy->getParameter<
+                std::vector<edm::ParameterSet> > ("QualityTests");
+        size_t qtPerNoisy = qTests.size();
+
+        std::vector < std::string > qtNames;
+        qtNames.reserve(qtPerNoisy);
+
+        std::vector < std::string > qtFullPathHists;
+        qtFullPathHists.reserve(qtPerNoisy);
+
+        std::vector<unsigned int> qtSumEnabled;
+        qtSumEnabled.reserve(qtPerNoisy);
+
+	std::cout << "\nLooping over noisy quality tests" << std::endl;
+        for (std::vector<edm::ParameterSet>::const_iterator itQT =
+                qTests.begin(); itQT != qTests.end(); ++itQT) {
+
+            totalNrQualityTests++;
+
+            qtNames.push_back(
+                    itQT->getParameter<std::string> ("QualityTestName"));
+
+            qtFullPathHists.push_back( itQT->getParameter<std::string> ("QualityTestHist"));
+	    std::cout << qtFullPathHists.back() << std::endl;
+
+            unsigned int qtEnabled = itQT->getParameter<unsigned int> (
+                    "QualityTestSummaryEnabled");
+
+            qtSumEnabled.push_back(qtEnabled);
+
+            if (qtEnabled) {
+                m_totalNrQtSummaryEnabled++;
+            }
+        }
+
+        m_noisyQualityTestName.push_back(qtNames);
+        m_noisyQualityTestHist.push_back(qtFullPathHists);
+        m_noisyQtSummaryEnabled.push_back(qtSumEnabled);
+
+        indexNois++;
+    }
+
+    // L1 Strip Dead=========================================================================================
+
+    m_nrDeadStrip = m_deadStrip.size();
+
+    m_deadLabel.reserve(m_nrDeadStrip);
+    m_deadDisable.reserve(m_nrDeadStrip);
+
+    // on average 20 quality tests per system 
+    m_deadQualityTestName.reserve(20*m_nrDeadStrip);  // Not needed? - AWB 05.12.16
+    m_deadQualityTestHist.reserve(20*m_nrDeadStrip);  // Not needed? - AWB 05.12.16
+    m_deadQtSummaryEnabled.reserve(20*m_nrDeadStrip);  // Not needed? - AWB 05.12.16
+
+    int indexDed = 0;
+
+    for (std::vector<edm::ParameterSet>::const_iterator itDead =
+            m_deadStrip.begin(); itDead != m_deadStrip.end(); ++itDead) {
+
+        m_deadLabel.push_back(itDead->getParameter<std::string>(
+                "DeadLabel"));
+
+        m_deadDisable.push_back(itDead->getParameter<unsigned int>(
+                "DeadDisable"));
+        // check the additional disable flag from m_disableDeadObjects
+        for (std::vector<std::string>::const_iterator itDed =
+                m_disableDeadStrip.begin(); itDed != m_disableDeadStrip.end(); ++itDed) {
+
+            if (*itDed == m_deadLabel[indexDed]) {
+                m_deadDisable[indexDed] = 1;
+            }
+        }
+
+        std::vector < edm::ParameterSet > qTests = itDead->getParameter<
+                std::vector<edm::ParameterSet> > ("QualityTests");
+        size_t qtPerDead = qTests.size();
+
+        std::vector < std::string > qtNames;
+        qtNames.reserve(qtPerDead);
+
+        std::vector < std::string > qtFullPathHists;
+        qtFullPathHists.reserve(qtPerDead);
+
+        std::vector<unsigned int> qtSumEnabled;
+        qtSumEnabled.reserve(qtPerDead);
+
+	std::cout << "\nLooping over dead quality tests" << std::endl;
+        for (std::vector<edm::ParameterSet>::const_iterator itQT =
+                qTests.begin(); itQT != qTests.end(); ++itQT) {
+
+            totalNrQualityTests++;
+
+            qtNames.push_back(
+                    itQT->getParameter<std::string> ("QualityTestName"));
+
+            qtFullPathHists.push_back( itQT->getParameter<std::string> ("QualityTestHist"));
+	    std::cout << qtFullPathHists.back() << std::endl;
+
+            unsigned int qtEnabled = itQT->getParameter<unsigned int> (
+                    "QualityTestSummaryEnabled");
+
+            qtSumEnabled.push_back(qtEnabled);
+
+            if (qtEnabled) {
+                m_totalNrQtSummaryEnabled++;
+            }
+        }
+
+        m_deadQualityTestName.push_back(qtNames);
+        m_deadQualityTestHist.push_back(qtFullPathHists);
+        m_deadQtSummaryEnabled.push_back(qtSumEnabled);
+
+        indexDed++;
+    }
+
+    m_summaryContent.reserve(m_nrTrackObjects + m_nrHitObjects + m_nrNoisyStrip + m_nrDeadStrip);
     m_meReportSummaryContent.reserve(totalNrQualityTests);
 
 }
@@ -461,6 +614,57 @@ void L1TEMTFEventInfoClient::book(DQMStore::IBooker &ibooker, DQMStore::IGetter 
 
     }
 
+		// for Noisy Strips ====================================================================
+    for (unsigned int iMon = 0; iMon < m_nrNoisyStrip; ++iMon) {
+
+      m_summaryContent.push_back(dqm::qstatus::DISABLED);
+
+        const std::vector<std::string>& objQtName =
+                m_noisyQualityTestName[iMon];
+
+        for (std::vector<std::string>::const_iterator itQtName =
+                objQtName.begin(); itQtName != objQtName.end(); ++itQtName) {
+
+	  // Avoid error in ibooker.bookFloat(hStr))
+	  std::string m_mon_mod = m_monitorDir;	  
+	  std::replace( m_mon_mod.begin(), m_mon_mod.end(), '/', '_' );
+
+            const std::string hStr = m_mon_mod + "_L1Obj_" + m_noisyLabel[iMon] + "_" + (*itQtName);
+	    std::cout << "    - " << hStr << std::endl;
+
+            m_meReportSummaryContent.push_back(ibooker.bookFloat(hStr));
+            m_meReportSummaryContent[iAllQTest]->Fill(0.);
+
+            iAllQTest++;
+        }
+        iAllMon++;
+    }
+		// for Dead Strips ====================================================================
+    for (unsigned int iMon = 0; iMon < m_nrDeadStrip; ++iMon) {
+
+      m_summaryContent.push_back(dqm::qstatus::DISABLED);
+
+        const std::vector<std::string>& objQtName =
+                m_deadQualityTestName[iMon];
+
+        for (std::vector<std::string>::const_iterator itQtName =
+                objQtName.begin(); itQtName != objQtName.end(); ++itQtName) {
+
+	  // Avoid error in ibooker.bookFloat(hStr))
+	  std::string m_mon_mod = m_monitorDir;	  
+	  std::replace( m_mon_mod.begin(), m_mon_mod.end(), '/', '_' );
+
+            const std::string hStr = m_mon_mod + "_L1Obj_" + m_deadLabel[iMon] + "_" + (*itQtName);
+	    std::cout << "    - " << hStr << std::endl;
+
+            m_meReportSummaryContent.push_back(ibooker.bookFloat(hStr));
+            m_meReportSummaryContent[iAllQTest]->Fill(0.);
+
+            iAllQTest++;
+        }
+        iAllMon++;
+    }
+
     std::cout << "Setting current folder to " << dirEventInfo << std::endl;
     ibooker.setCurrentFolder(dirEventInfo);
     std::cout << "Ran ibooker.setCurrentFolder(dirEventInfo);" << std::endl;
@@ -471,11 +675,13 @@ void L1TEMTFEventInfoClient::book(DQMStore::IBooker &ibooker, DQMStore::IGetter 
     }
 
     // define a histogram with two bins on X and maximum of m_nrTrackObjects, m_nrHitObjects on Y
-
     int nBinsY = std::max(m_nrTrackObjects, m_nrHitObjects);
+    int nBinsYStrip = std::max(m_nrNoisyStrip, m_nrDeadStrip);
 
     m_meReportSummaryMap = ibooker.book2D("reportSummaryMap",
             "reportSummaryMap", 2, 1, 3, nBinsY, 1, nBinsY + 1);
+    m_meReportSummaryMap_chamberStrip = ibooker.book2D("reportSummaryMap_chamberStrip",
+            "reportSummaryMap_chamberStrip", 2, 1, 3, nBinsYStrip, 1, nBinsYStrip + 1);
 
     if (m_monitorDir == "L1TEMU") {
         m_meReportSummaryMap->setTitle(
@@ -491,17 +697,21 @@ void L1TEMTFEventInfoClient::book(DQMStore::IBooker &ibooker, DQMStore::IGetter 
         // do nothing
     }
 
-    m_meReportSummaryMap->setAxisTitle("", 1);
-    m_meReportSummaryMap->setAxisTitle("", 2);
+    m_meReportSummaryMap->setAxisTitle(" ", 1);
+    m_meReportSummaryMap->setAxisTitle(" ", 2);
 
-    m_meReportSummaryMap->setBinLabel(1, "Track Objects", 1);
-    m_meReportSummaryMap->setBinLabel(2, "Hit objects", 1);
+    m_meReportSummaryMap->setBinLabel(1, "Noisy Check", 1);
+    m_meReportSummaryMap->setBinLabel(2, "Dead Check", 1);
+
+    m_meReportSummaryMap_chamberStrip->setBinLabel(1, "Noisy Check", 1);
+    m_meReportSummaryMap_chamberStrip->setBinLabel(2, "Dead Check", 1);
 
     for (int iBin = 0; iBin < nBinsY; ++iBin) {
-
         m_meReportSummaryMap->setBinLabel(iBin + 1, " ", 2);
-    }
-
+    } 
+    for (int iBin = 0; iBin < nBinsYStrip; ++iBin) {
+        m_meReportSummaryMap_chamberStrip->setBinLabel(iBin + 1, " ", 2);
+    } 
 }
 
 
@@ -514,9 +724,7 @@ void L1TEMTFEventInfoClient::readQtResults(DQMStore::IBooker &ibooker, DQMStore:
 
     for (std::vector<int>::iterator it = m_summaryContent.begin(); it
             != m_summaryContent.end(); ++it) {
-
         (*it) = dqm::qstatus::DISABLED;
-
     }
 
     m_summarySum = 0.;
@@ -526,16 +734,13 @@ void L1TEMTFEventInfoClient::readQtResults(DQMStore::IBooker &ibooker, DQMStore:
             != m_meReportSummaryContent.end(); ++itME) {
 
         (*itME)->Fill(0.);
-
     }
-
 
     // general counters:
     //   iAllQTest: all quality tests for all systems and objects
     //   iAllMon:   all monitored systems and objects
     int iAllQTest = 0;
     int iAllMon = 0;
-
 
     // quality tests for all L1 systems
 
@@ -768,9 +973,7 @@ void L1TEMTFEventInfoClient::readQtResults(DQMStore::IBooker &ibooker, DQMStore:
                     std::cout << "\nHistogram " << hitObjQtHist[iHitObjQTest]
                             << " not found\n" << std::endl;
                 }
-
             }
-
             // increase counters for quality tests
             iHitObjQTest++;
             iAllQTest++;
@@ -778,6 +981,230 @@ void L1TEMTFEventInfoClient::readQtResults(DQMStore::IBooker &ibooker, DQMStore:
         iAllMon++;
     }
 
+    // quality tests for all L1 Noisy Strip =================================================================
+
+    for (unsigned int iNoisyStrp = 0; iNoisyStrp < m_nrNoisyStrip; ++iNoisyStrp) {
+
+        // get the reports for each quality test
+        const std::vector<std::string>& noisyStrpQtName =
+                m_noisyQualityTestName[iNoisyStrp];
+        const std::vector<std::string>& noisyStrpQtHist =
+                m_noisyQualityTestHist[iNoisyStrp];
+        const std::vector<unsigned int>& noisyStrpQtSummaryEnabled =
+                m_noisyQtSummaryEnabled[iNoisyStrp];
+
+        // pro object counter for quality tests
+        int iNoisyStrpQTest = 0;
+
+        for (std::vector<std::string>::const_iterator itQtName =
+                noisyStrpQtName.begin(); itQtName != noisyStrpQtName.end(); ++itQtName) {
+
+            // get results, status and message
+            MonitorElement* qHist = igetter.get(noisyStrpQtHist[iNoisyStrpQTest]);
+
+            if (qHist) {
+                const std::vector<QReport*> qtVec = qHist->getQReports();
+                const std::string hName = qHist->getName();
+
+                if (m_verbose) {
+
+                    std::cout << "\nNumber of quality tests "
+                            << " for histogram " << noisyStrpQtHist[iNoisyStrpQTest]
+                            << ": " << qtVec.size() << "\n" << std::endl;
+                }
+
+                const QReport* objQReport = qHist->getQReport(*itQtName);
+                if (objQReport) {
+                    const float noisyStrpQtResult = objQReport->getQTresult();
+                    const int noisyStrpQtStatus = objQReport->getStatus();
+                    const std::string& noisyStrpQtMessage = objQReport->getMessage();
+
+                    if (m_verbose) {
+                        std::cout << "\n" << (*itQtName) << " quality test:"
+                                << "\n  result:  " << noisyStrpQtResult
+                                << "\n  status:  " << noisyStrpQtStatus
+                                << "\n  message: " << noisyStrpQtMessage << "\n"
+                                << "\nFilling m_meReportSummaryContent["
+                                << iAllQTest << "] with value "
+                                << noisyStrpQtResult << "\n" << std::endl;
+                    }
+
+                    m_meReportSummaryContent[iAllQTest]->Fill(noisyStrpQtResult);
+
+                    // for the summary map, keep the highest status value ("ERROR") of all tests
+                    // which are considered for the summary plot
+                    if (noisyStrpQtSummaryEnabled[iNoisyStrpQTest]) {
+
+                        if (noisyStrpQtStatus > m_summaryContent[iAllMon]) {
+                            m_summaryContent[iAllMon] = noisyStrpQtStatus;
+                        }
+                        m_summarySum += noisyStrpQtResult;
+                    }
+
+                } else {
+
+                    // for the summary map, if the test was not found but it is assumed to be
+                    // considered for the summary plot, set it to dqm::qstatus::INVALID
+
+                    int noisyStrpQtStatus = dqm::qstatus::INVALID;
+
+                    if (noisyStrpQtSummaryEnabled[iNoisyStrpQTest]) {
+
+                        if (noisyStrpQtStatus > m_summaryContent[iAllMon]) {
+                            m_summaryContent[iAllMon] = noisyStrpQtStatus;
+                        }
+                    }
+
+                    m_meReportSummaryContent[iAllQTest]->Fill(0.);
+
+                    if (m_verbose) {
+
+                        std::cout << "\n" << (*itQtName)
+                                << " quality test not found\n" << std::endl;
+                    }
+
+                }
+
+            } else {
+                // for the summary map, if the histogram was not found but it is assumed
+                // to have a test be considered for the summary plot, set it to dqm::qstatus::INVALID
+
+                int noisyStrpQtStatus = dqm::qstatus::INVALID;
+
+                if (noisyStrpQtSummaryEnabled[iNoisyStrpQTest]) {
+
+                    if (noisyStrpQtStatus > m_summaryContent[iAllMon]) {
+                        m_summaryContent[iAllMon] = noisyStrpQtStatus;
+                    }
+                }
+
+                m_meReportSummaryContent[iAllQTest]->Fill(0.);
+
+                if (m_verbose) {
+                    std::cout << "\nHistogram " << noisyStrpQtHist[iNoisyStrpQTest]
+                            << " not found\n" << std::endl;
+                }
+
+            }
+            // increase counters for quality tests
+            iNoisyStrpQTest++;
+            iAllQTest++;
+        }
+        iAllMon++;
+    }
+    // quality tests for all L1 Dead Strip =================================================================
+
+    for (unsigned int iDeadStrp = 0; iDeadStrp < m_nrDeadStrip; ++iDeadStrp) {
+
+        // get the reports for each quality test
+        const std::vector<std::string>& deadStrpQtName =
+                m_deadQualityTestName[iDeadStrp];
+        const std::vector<std::string>& deadStrpQtHist =
+                m_deadQualityTestHist[iDeadStrp];
+        const std::vector<unsigned int>& deadStrpQtSummaryEnabled =
+                m_deadQtSummaryEnabled[iDeadStrp];
+
+        // pro object counter for quality tests
+        int iDeadStrpQTest = 0;
+
+        for (std::vector<std::string>::const_iterator itQtName =
+                deadStrpQtName.begin(); itQtName != deadStrpQtName.end(); ++itQtName) {
+
+            // get results, status and message
+
+            MonitorElement* qHist = igetter.get(deadStrpQtHist[iDeadStrpQTest]);
+
+            if (qHist) {
+                const std::vector<QReport*> qtVec = qHist->getQReports();
+                const std::string hName = qHist->getName();
+
+                if (m_verbose) {
+
+                    std::cout << "\nNumber of quality tests "
+                            << " for histogram " << deadStrpQtHist[iDeadStrpQTest]
+                            << ": " << qtVec.size() << "\n" << std::endl;
+                }
+
+                const QReport* objQReport = qHist->getQReport(*itQtName);
+                if (objQReport) {
+                    const float deadStrpQtResult = objQReport->getQTresult();
+                    const int deadStrpQtStatus = objQReport->getStatus();
+                    const std::string& deadStrpQtMessage = objQReport->getMessage();
+
+                    if (m_verbose) {
+                        std::cout << "\n" << (*itQtName) << " quality test:"
+                                << "\n  result:  " << deadStrpQtResult
+                                << "\n  status:  " << deadStrpQtStatus
+                                << "\n  message: " << deadStrpQtMessage << "\n"
+                                << "\nFilling m_meReportSummaryContent["
+                                << iAllQTest << "] with value "
+                                << deadStrpQtResult << "\n" << std::endl;
+                    }
+
+                    m_meReportSummaryContent[iAllQTest]->Fill(deadStrpQtResult);
+
+                    // for the summary map, keep the highest status value ("ERROR") of all tests
+                    // which are considered for the summary plot
+                    if (deadStrpQtSummaryEnabled[iDeadStrpQTest]) {
+
+                        if (deadStrpQtStatus > m_summaryContent[iAllMon]) {
+                            m_summaryContent[iAllMon] = deadStrpQtStatus;
+                        }
+                        m_summarySum += deadStrpQtResult;
+                    }
+
+                } else {
+
+                    // for the summary map, if the test was not found but it is assumed to be
+                    // considered for the summary plot, set it to dqm::qstatus::INVALID
+
+                    int deadStrpQtStatus = dqm::qstatus::INVALID;
+
+                    if (deadStrpQtSummaryEnabled[iDeadStrpQTest]) {
+
+                        if (deadStrpQtStatus > m_summaryContent[iAllMon]) {
+                            m_summaryContent[iAllMon] = deadStrpQtStatus;
+                        }
+                    }
+
+                    m_meReportSummaryContent[iAllQTest]->Fill(0.);
+
+                    if (m_verbose) {
+
+                        std::cout << "\n" << (*itQtName)
+                                << " quality test not found\n" << std::endl;
+                    }
+
+                }
+
+            } else {
+                // for the summary map, if the histogram was not found but it is assumed
+                // to have a test be considered for the summary plot, set it to dqm::qstatus::INVALID
+
+                int deadStrpQtStatus = dqm::qstatus::INVALID;
+
+                if (deadStrpQtSummaryEnabled[iDeadStrpQTest]) {
+
+                    if (deadStrpQtStatus > m_summaryContent[iAllMon]) {
+                        m_summaryContent[iAllMon] = deadStrpQtStatus;
+                    }
+                }
+
+                m_meReportSummaryContent[iAllQTest]->Fill(0.);
+
+                if (m_verbose) {
+                    std::cout << "\nHistogram " << deadStrpQtHist[iDeadStrpQTest]
+                            << " not found\n" << std::endl;
+                }
+
+            }
+
+            // increase counters for quality tests
+            iDeadStrpQTest++;
+            iAllQTest++;
+        }
+        iAllMon++;
+    }
 
     // reportSummary value
     m_reportSummary = m_summarySum / float(m_totalNrQtSummaryEnabled);
@@ -791,7 +1218,6 @@ void L1TEMTFEventInfoClient::readQtResults(DQMStore::IBooker &ibooker, DQMStore:
         double summCont = static_cast<double>(m_summaryContent[iTrackObj]);
         m_meReportSummaryMap->setBinContent(1, iTrackObj + 1, summCont);
     }
-
     // fill the ReportSummaryMap for L1 objects (bin 2 on X)
     for (unsigned int iMon = m_nrTrackObjects; iMon < m_nrTrackObjects
             + m_nrHitObjects; ++iMon) {
@@ -800,7 +1226,16 @@ void L1TEMTFEventInfoClient::readQtResults(DQMStore::IBooker &ibooker, DQMStore:
         m_meReportSummaryMap->setBinContent(2, iMon - m_nrTrackObjects + 1, summCont);
 
     }
+
+    // fill the ReportSummaryMap_chamberStrip for L1 Noisy Strip (bin 1 on X)
+    for (unsigned int iNoisyStrp = m_nrTrackObjects + m_nrHitObjects; iNoisyStrp < m_nrTrackObjects + m_nrHitObjects + m_nrNoisyStrip; ++iNoisyStrp) {
+        double summCont = static_cast<double>(m_summaryContent[iNoisyStrp]);
+        m_meReportSummaryMap_chamberStrip->setBinContent(1, iNoisyStrp - m_nrTrackObjects - m_nrHitObjects + 1, summCont);
+    }
+    // fill the ReportSummaryMap_chamberStrip for L1 objects (bin 2 on X)
+    for (unsigned int iDeadStrp = m_nrTrackObjects + m_nrHitObjects + m_nrNoisyStrip; iDeadStrp < m_nrTrackObjects + m_nrHitObjects + m_nrNoisyStrip + m_nrDeadStrip; ++iDeadStrp) {
+        double summCont = static_cast<double>(m_summaryContent[iDeadStrp]);
+        m_meReportSummaryMap_chamberStrip->setBinContent(2, iDeadStrp - m_nrTrackObjects - m_nrHitObjects - m_nrNoisyStrip + 1, summCont);
+    } 
+
 }
-
-
-

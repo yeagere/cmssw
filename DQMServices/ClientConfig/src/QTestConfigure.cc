@@ -218,6 +218,10 @@ void QTestConfigure::EnableContentSigmaTest(std::string testName,
   double toleranceDead = atof(findOrDefault(params, "toleranceDead", "0"));
   int noisy = atoi(findOrDefault(params, "noisy", "0"));
   int dead = atoi(findOrDefault(params, "dead", "0"));
+  unsigned int xMin = (unsigned int) atof(findOrDefault(params, "xMin", "1"));
+  unsigned int xMax = (unsigned int) atof(findOrDefault(params, "xMax", "500"));
+  unsigned int yMin = (unsigned int) atof(findOrDefault(params, "yMin", "1"));
+  unsigned int yMax = (unsigned int) atof(findOrDefault(params, "yMax", "500")); 
   double warning = atof(findOrDefault(params, "warning", "0"));
   double error = atof(findOrDefault(params, "error", "0"));
   me_qc1->setNumNeighborsX (neighborsX);
@@ -226,6 +230,10 @@ void QTestConfigure::EnableContentSigmaTest(std::string testName,
   me_qc1->setToleranceDead (toleranceDead);
   me_qc1->setNoisy (noisy);
   me_qc1->setDead (dead);
+  me_qc1->setXMin (xMin);
+  me_qc1->setXMax (xMax);
+  me_qc1->setYMin (yMin);
+  me_qc1->setYMax (yMax); 
   me_qc1->setWarningProb(warning);
   me_qc1->setErrorProb(error);
 }

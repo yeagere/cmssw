@@ -398,9 +398,22 @@ public:
     dead_ = dead; 
   }
 
+	void setXMin(unsigned xMin) {
+		xMin_ = xMin;
+	}
+	void setXMax(unsigned xMax) {
+		xMax_ = xMax;
+	}
+	void setYMin(unsigned yMin) {
+		yMin_ = yMin;
+	}
+	void setYMax(unsigned yMax) {
+		yMax_ = yMax;
+	} 
+
 protected:
   /// for each bin get sum of the surrounding neighbors
-  double getNeighborSum(int binX, int binY, int neighborsX, int neighborsY, const TH1 *h) const; 
+  double getNeighborSum(int binX, int binY, unsigned neighborsX, unsigned neighborsY, const TH1 *h) const; 
 
   bool noisy_; bool dead_;   /*< declare if test will be checking for noisy channels, dead channels, or both */
   float toleranceNoisy_;        /*< factor by which sigma is compared for noisy channels */
@@ -410,6 +423,10 @@ protected:
   unsigned numNeighborsY_;  /*< # of neighboring channels along y-axis for calculating average to be used
 			     for comparison with channel under consideration */
   bool rangeInitialized_;  /*< init-flag for tolerance */
+	unsigned xMin_;
+	unsigned xMax_;
+	unsigned yMin_;
+	unsigned yMax_; 
 };
 
 //==================== ContentsWithinExpected  =========================//

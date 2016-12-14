@@ -175,11 +175,16 @@ DQMStoreQTestsExample::DQMStoreQTestsExample(const edm::ParameterSet& iConfig ) 
     contentSigma_test->setToleranceNoisy(1);
     contentSigma_test->setToleranceDead(1);
     // set # of neighboring channels for calculating average (default: 1)
-    contentSigma_test->setNumNeighborsX(10);
-    contentSigma_test->setNumNeighborsY(10);
+    contentSigma_test->setNumNeighborsX(1);
+    contentSigma_test->setNumNeighborsY(1);
     // declare whether to test for noisy or dead bins
     contentSigma_test->setNoisy(1);
     contentSigma_test->setDead(1);
+	// specify area of histogram to be analyzed
+    contentSigma_test->setXMin(1);
+    contentSigma_test->setXMax(500);
+    contentSigma_test->setYMin(1);
+    contentSigma_test->setYMax(500); 
 //==========================================================================//
   meanNear_test->useRMS();
   // Setup MostProbableLandau

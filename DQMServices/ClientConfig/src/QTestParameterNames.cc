@@ -16,7 +16,8 @@ QTestParameterNames::QTestParameterNames(){
 	this->constructMap(ContentsYRangeROOT::getAlgoName(), "ymin", "ymax","useEmptyBins");
 	this->constructMap(DeadChannelROOT::getAlgoName(),   "threshold");
 	this->constructMap(NoisyChannelROOT::getAlgoName(),  "tolerance", "neighbours");
-	this->constructMap(ContentSigmaROOT::getAlgoName(),  "toleranceNoisy", "toleranceDead", "neighboursX", "neighboursY","noisy", "dead"); //added by Emma
+	this->constructMap(ContentSigmaROOT::getAlgoName(),  "toleranceNoisy", "toleranceDead", "neighboursX", "neighboursY","noisy", "dead", "xMin", "xMax", "yMin", "yMax"); //added by Emma
+//	this->constructMap(ContentSigmaROOT::getAlgoName(),  "toleranceNoisy", "toleranceDead", "neighboursX", "neighboursY","noisy", "dead"); //added by Emma
 	this->constructMap(MeanWithinExpectedROOT::getAlgoName(), "mean","useRMS","useSigma","useRange","xmin","xmax");
 
 	//======================== new quality tests in the parser =====================//
@@ -37,7 +38,7 @@ QTestParameterNames::QTestParameterNames(){
 
 
 void QTestParameterNames::constructMap(std::string testType, std::string param1,std::string param2,std::string param3,
-	     std::string param4,std::string param5,std::string param6,std::string param7,std::string param8){
+	     std::string param4,std::string param5,std::string param6,std::string param7,std::string param8,std::string param9,std::string param10,std::string param11,std::string param12){
 	
 	
 	std::vector<std::string> paramNames;
@@ -48,7 +49,11 @@ void QTestParameterNames::constructMap(std::string testType, std::string param1,
 	if(std::strcmp(param5.c_str(),"undefined")) paramNames.push_back(param5);       
 	if(std::strcmp(param6.c_str(),"undefined")) paramNames.push_back(param6);       
 	if(std::strcmp(param7.c_str(),"undefined")) paramNames.push_back(param7);       
-	if(std::strcmp(param8.c_str(),"undefined")) paramNames.push_back(param8);       
+	if(std::strcmp(param8.c_str(),"undefined")) paramNames.push_back(param8);
+	if(std::strcmp(param9.c_str(),"undefined")) paramNames.push_back(param9);       
+	if(std::strcmp(param10.c_str(),"undefined")) paramNames.push_back(param10);       
+	if(std::strcmp(param11.c_str(),"undefined")) paramNames.push_back(param11);       
+	if(std::strcmp(param12.c_str(),"undefined")) paramNames.push_back(param12);       
  	
 	configurationMap[testType]=paramNames;
 	

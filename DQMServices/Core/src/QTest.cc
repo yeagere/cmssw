@@ -965,8 +965,8 @@ float ContentSigma::runTest(const MonitorElement *me)
     std::cout << "QTest:" << getAlgoName() << "::runTest called on " 
               << me-> getFullname() << "\n";
 
-  int nbinsX;
-  int nbinsY;
+  unsigned nbinsX;
+  unsigned nbinsY;
 
   //-- TH1F
   if (me->kind()==MonitorElement::DQM_KIND_TH1F)
@@ -1024,12 +1024,37 @@ float ContentSigma::runTest(const MonitorElement *me)
   if ( !rangeInitialized_ || !h->GetXaxis() ) 
     return 1; // all channels are accepted if tolerance has not been set
 
-  // do NOT use underflow bin
-  int first = 1;
-  // initialize bin failure count
-  int fail = 0;
-  int neighborsX = numNeighborsX_; 
-  int neighborsY = numNeighborsY_;
+  int fail = 0;   // initialize bin failure count
+  //initialize minimums and maximums with expected values
+  unsigned xMin = 1;
+	unsigned yMin =1;
+  unsigned xMax = nbinsX; 
+  unsigned yMax = nbinsY;
+  unsigned neighborsX = numNeighborsX_; 
+  unsigned neighborsY = numNeighborsY_;
+
+	string histName = h->GetName();
+	if (histName == "emtfChamberStripMENeg11a") {
+  	std::printf("xMin: %i, xMax: %i, yMin: %i, yMax: %i, nbinsX: %i, nbinsY: %i, X neighbors: %i and Y neighbors: %i\n", xMin, xMax, yMin, yMax, nbinsX, nbinsY, neighborsX, neighborsY);
+	}
+
+	if (xMin_ != 0 && xMax_ != 0) {	//give users option for automatic mininum and maximum selection by inputting 0 to any of the parameters
+		// check that user's parameters are completely in agreement with histogram
+		// for instance, if inputted xMax is out of range xMin will automatically be ignored
+		if ((xMax_ <= nbinsX) && (xMin_ <= xMax_)) { // rescale area of histogram being analyzed
+			nbinsX = xMax_ - xMin_ + 1;
+			xMax = xMax_;  // do NOT use overflow bin
+			xMin = xMin_;   // do NOT use underflow bin
+		}
+	}
+	if (yMin_ != 0 && yMax_ != 0) {	//give users option for automatic mininum and maximum selection by inputting 0 to any of the parameters
+		if ((yMax_ <= nbinsY) && (yMin_ <= yMax_)) { // rescale area of histogram being analyzed
+			nbinsY = yMax_ - yMin_ + 1;
+			yMax = yMax_;
+		  yMin = yMin_;
+		}
+	}
+
   if (neighborsX*2 >= nbinsX) {//make sure neighbor check does not overlap with bin under consideration
     if (nbinsX%2 == 0) {
       neighborsX = nbinsX/2 - 1; //set neighbors for no overlap
@@ -1043,14 +1068,18 @@ float ContentSigma::runTest(const MonitorElement *me)
     else { neighborsY = (nbinsY - 1)/2; }
   }
 
-  for (int binY = first; binY <= nbinsY; ++binY) { //for all histogram exempting overflow bins
-    for (int binX = first; binX <= nbinsX; ++binX) {
+	if (histName == "emtfChamberStripMENeg11a") {
+  	std::printf("xMin: %i, xMax: %i, yMin: %i, yMax: %i, nbinsX: %i, nbinsY: %i, X neighbors: %i and Y neighbors: %i\n", xMin, xMax, yMin, yMax, nbinsX, nbinsY, neighborsX, neighborsY);
+	}
+
+  for (unsigned binY = yMin; binY <= yMax; ++binY) { //for all histogram exempting overflow bins
+    for (unsigned binX = xMin; binX <= xMax; ++binX) {
       unsigned int content = abs(h->GetBinContent(binX, binY));
       double sum = getNeighborSum(binX, binY, neighborsX, neighborsY, h);
       double average = sum/((2*neighborsX + 1)*(2*neighborsY + 1) - 1);
-      //double sigma = sqrt(average*sqrt(sum)/sum + abs(content));
-			double probNoisy = ROOT::Math::poisson_cdf_c(content, average);
-			double probDead = ROOT::Math::poisson_cdf(content, average);
+      double avg_uncrt = average*sqrt(sum)/sum;
+			double probNoisy = ROOT::Math::poisson_cdf_c(content - 1, average + avg_uncrt);
+			double probDead = ROOT::Math::poisson_cdf(content, average - avg_uncrt);
 			double thresholdNoisy = ROOT::Math::normal_cdf_c(toleranceNoisy_);
 			double thresholdDead = ROOT::Math::normal_cdf(-1 * toleranceDead_);
 			//std::printf("Bin content: %f with sigma: %f and surrounding averge: %f\n", content, sigma, average);
@@ -1069,25 +1098,23 @@ float ContentSigma::runTest(const MonitorElement *me)
 					}
 	 			}
 	 			else if (noisy_) {
-					if (content > average) {
+					if (content != 0) {
 	        	failureNoisy = probNoisy < thresholdNoisy;
 					}
 	 			}
 	 			else if (dead_) {
-					if (content < average) {
 	        	failureDead = probDead < thresholdDead;
-					}	
 	 			}
 				else { std::cout<<"No test type selected!\n";  }
+				string histName = h->GetName();
+				if (histName == "emtfChamberStripMENeg11a") {
+//					std::printf("  For content: %i we get average: %f\n", content, average);
+//					std::printf("   NOISY:: Probability: %f and Threshold: %f\n", probNoisy, thresholdNoisy);
+//					std::printf("   DEAD::  Probability: %f and Threshold: %f\n", probDead, thresholdDead);
+//					std::printf("For bin: (%i,%i) we get failureNoisy: %i and failureDead: %i\n", binX, binY, failureNoisy, failureDead);
+				}
       	if (failureNoisy || failureDead) {
 	        ++fail;
-					string histName = h->GetName();
-					if (histName == "emtfChamberStripMENeg11a") {
-						std::printf("  For content: %i we get average: %f\n", content, average);
-						std::printf("   NOISY:: Probability: %f and Threshold: %f\n", probNoisy, thresholdNoisy);
-						std::printf("   DEAD::  Probability: %f and Threshold: %f\n", probDead, thresholdDead);
-						std::printf("For bin: (%i,%i) we get failureNoisy: %i and failureDead: %i\n", binX, binY, failureNoisy, failureDead);
-					}
         	DQMChannel chan(binX, 0, 0, content, h->GetBinError(binX));
         	badChannels_.push_back(chan);
       	}
@@ -1098,32 +1125,47 @@ float ContentSigma::runTest(const MonitorElement *me)
 }
 
 // get average for bin under consideration
-double ContentSigma::getNeighborSum(int binX, int binY, int neighborsX, int neighborsY, const TH1 *h) const
+double ContentSigma::getNeighborSum(int binX, int binY, unsigned neighborsX, unsigned neighborsY, const TH1 *h) const
 {
   /// do NOT use underflow bin
-  int first = 1;
   double sum = 0;
-  int ncx = h->GetXaxis()->GetNbins();
-  int ncy = h->GetYaxis()->GetNbins();
-  int bin_lowX, bin_hiX, bin_lowY, bin_hiY;
+  unsigned nbinsX = h->GetXaxis()->GetNbins();
+  unsigned nbinsY = h->GetYaxis()->GetNbins();
+	unsigned xMin = 1;
+	unsigned yMin = 1;
+	unsigned xMax = nbinsX;
+	unsigned yMax = nbinsY;
 
-  for (int i = 0; i <= neighborsX; ++i) { //scan entire chamber
-    for (int j = 0; j <= neighborsY; ++j) { 
+	if (((xMax_ - xMin_ + 1) < nbinsX) && (xMax_ < nbinsX) && (xMin_ < nbinsX)) { // rescale area of histogram being analyzed
+		nbinsX = xMax_ - xMin_ + 1;
+		xMax = xMax_;  // do NOT use overflow bin
+		xMin = xMin_;   // do NOT use underflow bin
+	}
+	if (((yMax_ - yMin_ + 1) < nbinsY) && (yMax_ < nbinsY) && (yMin_ < nbinsY)) { // rescale area of histogram being analyzed
+		nbinsY = yMax_ - yMin_ + 1;
+		yMax = yMax_;
+	  yMin = yMin_;
+	}
+
+  unsigned bin_lowX, bin_hiX, bin_lowY, bin_hiY;
+
+  for (unsigned i = 0; i <= neighborsX; ++i) { //scan entire chamber
+    for (unsigned j = 0; j <= neighborsY; ++j) { 
 			if (i == 0 && j == 0) continue;	
       /// use symmetric-to-bin bins to calculate average
       bin_lowX = binX-i;  bin_hiX = binX+i;
       /// check if need to consider bins on other side of spectrum
       /// (ie. if bins below 1 or above ncx)
-      while (bin_lowX < first) // shift bin by +ncx
-        bin_lowX = ncx + bin_lowX;
-      while (bin_hiX > ncx) // shift bin by -ncx
-        bin_hiX = bin_hiX - ncx;
+      while (bin_lowX < xMin) // shift bin by +ncx
+        bin_lowX = nbinsX + bin_lowX;
+      while (bin_hiX > xMax) // shift bin by -ncx
+        bin_hiX = bin_hiX - nbinsX;
 
       bin_lowY = binY-j;  bin_hiY = binY+j;
-      while (bin_lowY < first) // shift bin by +ncy
-				bin_lowY = ncy + bin_lowY;
-      while (bin_hiY > ncy) // shift bin by -ncy
-       	bin_hiY = bin_hiY - ncy;
+      while (bin_lowY < yMin) // shift bin by +ncy
+				bin_lowY = nbinsY + bin_lowY;
+      while (bin_hiY > yMax) // shift bin by -ncy
+       	bin_hiY = bin_hiY - nbinsY;
 			if (i == 0) {
       	sum += h -> GetBinContent(binX, bin_lowY) + //sum upper and lower centered y sections
 	     	h -> GetBinContent(binX, bin_hiY);

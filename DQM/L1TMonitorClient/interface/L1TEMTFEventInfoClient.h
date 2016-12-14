@@ -75,6 +75,11 @@ private:
     std::vector<std::string> m_disableTrackObjects;
     std::vector<std::string> m_disableHitObjects;
 
+    std::vector<edm::ParameterSet> m_noisyStrip;
+    std::vector<edm::ParameterSet> m_deadStrip;
+    std::vector<std::string> m_disableNoisyStrip;
+    std::vector<std::string> m_disableDeadStrip;
+
     /// private methods
 
     /// initialize properly all elements
@@ -94,6 +99,12 @@ private:
 
     /// number of L1 trigger objects
     size_t m_nrHitObjects;
+
+    /// number of L1 trigger noisy strips
+    size_t m_nrNoisyStrip;
+
+    /// number of L1 trigger dead strips
+    size_t m_nrDeadStrip;
 
     /// total number of quality tests enabled for summary report for L1 trigger systems
     /// and L1 trigger objects
@@ -115,6 +126,22 @@ private:
     std::vector<std::vector<std::string> > m_hitQualityTestHist;
     std::vector<std::vector<unsigned int> > m_hitQtSummaryEnabled;
 
+    std::vector<int> m_noisyDisable;
+    std::vector<std::string> m_noisyLabel;
+    std::vector<std::string> m_noisyFolder;
+
+    std::vector<std::vector<std::string> > m_noisyQualityTestName;
+    std::vector<std::vector<std::string> > m_noisyQualityTestHist;
+    std::vector<std::vector<unsigned int> > m_noisyQtSummaryEnabled;
+
+    std::vector<int> m_deadDisable;
+    std::vector<std::string> m_deadLabel;
+    std::vector<std::string> m_deadFolder;
+
+    std::vector<std::vector<std::string> > m_deadQualityTestName;
+    std::vector<std::vector<std::string> > m_deadQualityTestHist;
+    std::vector<std::vector<unsigned int> > m_deadQtSummaryEnabled;
+
     /// summary report
 
     Float_t m_reportSummary;
@@ -129,6 +156,7 @@ private:
 
     /// report summary map
     MonitorElement* m_meReportSummaryMap;
+    MonitorElement* m_meReportSummaryMap_chamberStrip;
 };
 
 #endif

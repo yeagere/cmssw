@@ -127,6 +127,55 @@ l1tEMTFEventInfoClient = cms.EDAnalyzer("L1TEMTFEventInfoClient",
                             )  ## End QualityTests = cms.VPSet(
                         ),  ## End cms.PSet(  ...  ObjectLabel = cms.string("NoisyDead_MEPos22"),
                     ),  ## End HitObjects = cms.VPSet(
+
+    NoisyStrip = cms.VPSet(
+                    cms.PSet(
+                        NoisyLabel = cms.string("ChamberStrip_Noisy"),
+                        NoisyDisable  = cms.uint32(0),
+                        QualityTests = cms.VPSet(
+                            cms.PSet(
+                                QualityTestName = cms.string("ContentSigma_Noisy"),
+                                QualityTestHist = cms.string("L1T2016/L1TStage2EMTF/emtfChamberStripMENeg11a"),
+                                QualityTestSummaryEnabled = cms.uint32(1)
+                                )
+                            ) 
+                        ),
+                    cms.PSet(
+                        NoisyLabel = cms.string("ChamberStrip_Dead"),
+                        NoisyDisable  = cms.uint32(0),
+                        QualityTests = cms.VPSet(
+                            cms.PSet(
+                                QualityTestName = cms.string("ContentSigma_Dead"),
+                                QualityTestHist = cms.string("L1T2016/L1TStage2EMTF/emtfChamberStripMENeg11a"),
+                                QualityTestSummaryEnabled = cms.uint32(1)
+                                )
+                            )  ## End QualityTests = cms.VPSet(
+                        ),  ## End cms.PSet(  ...  ObjectLabel = cms.string("NoisyDead_MEPos22"),
+                    ),  ## End HitObjects = cms.VPSet(
+    DeadStrip = cms.VPSet(
+                    cms.PSet(
+                        DeadLabel = cms.string("ChamberStrip_Noisy"),
+                        DeadDisable  = cms.uint32(0),
+                        QualityTests = cms.VPSet(
+                            cms.PSet(
+                                QualityTestName = cms.string("ContentSigma_Noisy"),
+                                QualityTestHist = cms.string("L1T2016/L1TStage2EMTF/emtfChamberStripMENeg11a"),
+                                QualityTestSummaryEnabled = cms.uint32(1)
+                                )
+                            ) 
+                        ),
+                    cms.PSet(
+                        DeadLabel = cms.string("ChamberStrip_Dead"),
+                        DeadDisable  = cms.uint32(0),
+                        QualityTests = cms.VPSet(
+                            cms.PSet(
+                                QualityTestName = cms.string("ContentSigma_Dead"),
+                                QualityTestHist = cms.string("L1T2016/L1TStage2EMTF/emtfChamberStripMENeg11a"),
+                                QualityTestSummaryEnabled = cms.uint32(1)
+                                )
+                            )  ## End QualityTests = cms.VPSet(
+                        ),  ## End cms.PSet(  ...  ObjectLabel = cms.string("NoisyDead_MEPos22"),
+                    ),  ## End HitObjects = cms.VPSet(
     #
     # fast over-mask a system: if the name of the system is in the list, the system will be masked
     # (the default mask value is given in TrackObjects VPSet)             
@@ -136,6 +185,8 @@ l1tEMTFEventInfoClient = cms.EDAnalyzer("L1TEMTFEventInfoClient",
     # fast over-mask an object: if the name of the object is in the list, the object will be masked
     # (the default mask value is given in HitObjects VPSet)             
     # 
-    DisableHitObjects =  cms.vstring()   
+    DisableHitObjects =  cms.vstring(),
+    DisableNoisyStrip = cms.vstring(),
+    DisableDeadStrip = cms.vstring()   
 
 )

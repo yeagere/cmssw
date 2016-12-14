@@ -70,11 +70,16 @@ class DQMQualityTest
     contentSigma_test_->setToleranceNoisy(1);
     contentSigma_test_->setToleranceDead(1);
     // set # of neighboring channels for calculating average (default: 1)
-    contentSigma_test_->setNumNeighborsX(10);
-    contentSigma_test_->setNumNeighborsY(10);
+    contentSigma_test_->setNumNeighborsX(1);
+    contentSigma_test_->setNumNeighborsY(1);
     // declare whether to test for noisy or dead bins
     contentSigma_test_->setNoisy(1);
     contentSigma_test_->setDead(1);
+	// specify area of histogram to be analyzed
+    contentSigma_test_->setXMin(1);
+    contentSigma_test_->setXMax(500);
+    contentSigma_test_->setYMin(1);
+    contentSigma_test_->setYMax(500); 
 //==========================================================================//
 
     // Mean-within-expected-value test

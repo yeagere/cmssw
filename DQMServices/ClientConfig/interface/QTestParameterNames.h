@@ -31,7 +31,9 @@ struct QTestParameterNames{
 		std::string param1="undefined",std::string param2="undefined",std::string param3="undefined",
 		std::string param4="undefined",std::string param5="undefined",
 		std::string param6="undefined",std::string param7="undefined"
-		,std::string param8="undefined");
+		,std::string param8="undefined",std::string param9="undefined",
+		std::string param10="undefined",std::string param11="undefined"
+		,std::string param12="undefined");
 
   private:
 	std::map<std::string, std::vector<std::string> > configurationMap;

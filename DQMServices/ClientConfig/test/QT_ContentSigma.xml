@@ -1,15 +1,21 @@
 <TESTSCONFIGURATION>
 
 <QTEST name="exampleQTest">
-	<TYPE>NoisyChannel</TYPE>	
-	<PARAM name="toleranceNoisy">0.2</PARAM>
-	<PARAM name="toleranceDead">0.2</PARAM>
-	<PARAM name="neighboursX">2</PARAM>
-	<PARAM name="neighboursY">2</PARAM>
-	<PARAM name="noisy">2</PARAM>
-	<PARAM name="dead">2</PARAM>
+	<TYPE>ContentSigma</TYPE>	
+	<PARAM name="toleranceNoisy">1</PARAM>
+	<PARAM name="toleranceDead">1</PARAM>
+	<PARAM name="neighboursX">1</PARAM>
+	<PARAM name="neighboursY">1</PARAM>
+	<PARAM name="noisy">1</PARAM>
+	<PARAM name="dead">1</PARAM>
 	<PARAM name="error">0.30</PARAM>
 	<PARAM name="warning">0.70</PARAM>
+
+	<!-- optional additional parameters -->
+	<PARAM name="xMin">1</PARAM> <!-- specify area of histogram to be analyzed -->
+	<PARAM name="xMax">1000</PARAM>
+	<PARAM name="yMin">1</PARAM>
+	<PARAM name="yMax">1000</PARAM> 
 </QTEST>
 
 <!-- <LINK name="*clientHisto*"> -->
