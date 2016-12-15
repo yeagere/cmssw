@@ -38,17 +38,6 @@ l1tEMTFEventInfoClient = cms.EDAnalyzer("L1TEMTFEventInfoClient",
     # in the emulator column (left column)
     TrackObjects = cms.VPSet(
                     cms.PSet(
-                        SystemLabel = cms.string("HitBX"),
-                        SystemDisable  = cms.uint32(0),
-                        QualityTests = cms.VPSet(
-                            cms.PSet(
-                                QualityTestName = cms.string("ContentSigma_Noisy_HitBX"),
-                                QualityTestHist = cms.string("L1T2016/L1TStage2EMTF/emtfHitBX"),
-                                QualityTestSummaryEnabled = cms.uint32(1)
-                                )
-                            )  
-                        ),
-                    cms.PSet(
                         SystemLabel = cms.string("TrackBX"),
                         SystemDisable  = cms.uint32(0),
                         QualityTests = cms.VPSet(
@@ -80,17 +69,6 @@ l1tEMTFEventInfoClient = cms.EDAnalyzer("L1TEMTFEventInfoClient",
     # the position in the parameter set gives, in reverse order, the position in the reportSummaryMap
     # in the trigger object column (right column)
     HitObjects = cms.VPSet(
-                    cms.PSet(
-                        HitLabel = cms.string("HitBX"),
-                        HitDisable  = cms.uint32(0),
-                        QualityTests = cms.VPSet(
-                            cms.PSet(
-                                QualityTestName = cms.string("ContentSigma_Dead_HitBX"),
-                                QualityTestHist = cms.string("L1T2016/L1TStage2EMTF/emtfHitBX"),
-                                QualityTestSummaryEnabled = cms.uint32(1)
-                                )
-                            )  
-                        ),
                     cms.PSet(
                         HitLabel = cms.string("TrackBX"),
                         HitDisable  = cms.uint32(0),
