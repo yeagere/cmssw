@@ -179,10 +179,10 @@ void L1TEMTFEventInfoClient::initialize() {
             m_hitObjects.begin(); itObject != m_hitObjects.end(); ++itObject) {
 
         m_hitLabel.push_back(itObject->getParameter<std::string>(
-                "ObjectLabel"));
+                "HitLabel"));
 
         m_hitDisable.push_back(itObject->getParameter<unsigned int>(
-                "ObjectDisable"));
+                "HitDisable"));
         // check the additional disable flag from m_disableHitObjects
         for (std::vector<std::string>::const_iterator itObj =
                 m_disableHitObjects.begin(); itObj != m_disableHitObjects.end(); ++itObj) {
@@ -706,11 +706,17 @@ void L1TEMTFEventInfoClient::book(DQMStore::IBooker &ibooker, DQMStore::IGetter 
     m_meReportSummaryMap_chamberStrip->setBinLabel(1, "Noisy Check", 1);
     m_meReportSummaryMap_chamberStrip->setBinLabel(2, "Dead Check", 1);
 
-    for (int iBin = 0; iBin < nBinsY; ++iBin) {
-        m_meReportSummaryMap->setBinLabel(iBin + 1, " ", 2);
-    } 
+//    for (int iBin = 0; iBin < nBinsY; ++iBin) {
+//        m_meReportSummaryMap->setBinLabel(iBin + 1, " ", 2);   } 
+
+    m_meReportSummaryMap->setBinLabel(1, "Hit BX", 2);
+    m_meReportSummaryMap->setBinLabel(2, "Track BX", 2);
+    m_meReportSummaryMap->setBinLabel(3, "Track Phi", 2);
+
+    std::string name;
+		std::vector<std::string> suffix_name = {"-4/2", "-4/1", "-3/2", "-3/1", "-2/2", "-2/1", "-1/3", "-1/2", "-1/1b", "-1/1a", "+1/1a", "+1/1b", "+1/2", "+1/3", "+2/1", "+2/2", "+3/1", "+3/2", "+4/1", "+4/2"};
     for (int iBin = 0; iBin < nBinsYStrip; ++iBin) {
-        m_meReportSummaryMap_chamberStrip->setBinLabel(iBin + 1, " ", 2);
+        m_meReportSummaryMap_chamberStrip->setBinLabel(iBin + 1, "ChamberStrip " + suffix_name[iBin], 2);
     } 
 }
 
